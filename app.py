@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-# Path to your Firebase service account key JSON file
+# Path to Firebase service account key JSON file
 service_account_path = "path/to/serviceAccountKey.json"
 
 # Initialize Firebase Admin SDK
