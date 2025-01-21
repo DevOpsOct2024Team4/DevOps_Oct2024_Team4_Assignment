@@ -1,4 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+# Initialize Firebase Admin SDK
+cred = credentials.Certificate("")
+firebase_admin.initialize_app(cred)
+
+# Firestore client
+db = firestore.client()
 
 # Initialize the Flask app
 app = Flask(__name__)
