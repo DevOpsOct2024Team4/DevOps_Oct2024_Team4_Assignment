@@ -18,7 +18,7 @@ db = firestore.client()
 app = Flask(__name__)
 app.secret_key = "DevOps_key_Team4"  # For session and flash messages
 
-# Sample Matriculation List (Case Study)
+# Sample Matriculation List (Case Study) [Replace with firebase data when ready]
 students = [
     {"id": "A1234567X", "name": "John Tan", "points": 50},
     {"id": "A1234568Y", "name": "Sarah Lim", "points": 80}
@@ -30,7 +30,63 @@ redeemable_items = [
 
 # Page Routes
 
-@app.route("/")
+@app.route("/")    # Landing Page
 def home():
     """Landing page."""
     return render_template("index.html")
+
+@app.route("/login", methods=["GET", "POST"])    # Login Page
+def login():
+    """Login page for both admin and students."""
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        # To be replaced with authentication logic later on
+        if username and password:
+            # Redirect to different pages based on user type (Improve later on if neccessary)
+            if username == "admin":
+                return redirect(url_for("admin_dashboard"))
+            else:
+                return redirect(url_for("student_dashboard", student_id=username))
+        else:
+            flash("Invalid username or password")
+    return render_template("login.html")
+
+@app.route("/admin")    # Admin Page
+def admin_dashboard():
+    """Admin dashboard to manage students and items."""
+    return render_template("admin.html", students=students, items=redeemable_items)
+
+@app.route("/student/<student_id>")    # Student Page
+def student_dashboard(student_id):
+    """Student dashboard to view and redeem items."""
+    student = next((s for s in students if s["id"] == student_id), None)
+    if not student:
+        return "Student ID not found!", 404
+    return render_template("student.html", student=student, items=redeemable_items)
+
+@app.route("/redeem", methods=["POST"])    # Redeem Page
+def redeem():
+    """Handle item redemption by students."""
+    student_id = request.form["student_id"]
+    item_name = request.form["item_name"]
+
+    # Find student and item
+    student = next((s for s in students if s["id"] == student_id), None)
+    item = next((i for i in redeemable_items if i["name"] == item_name), None)
+
+    # Points Redemption Logic
+    if student and item:
+        if student["points"] >= item["value"] and item["quantity"] > 0:
+            student["points"] -= item["value"]
+            item["quantity"] -= 1
+            flash(f"Successfully redeemed {item_name}!")
+        else:
+            flash("You have insufficient points or the item out of stock.")
+    else:
+        flash("Invalid student or item.")
+    return redirect(url_for("student_dashboard", student_id=student_id))
+
+if __name__ == "__main__":
+    app.run(debug=True)
