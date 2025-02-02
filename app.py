@@ -90,3 +90,13 @@ def redeem():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+@app.route("/test_firebase")    # Test firebase connection
+def test_firebase():
+    try:
+        # Trying to fetch documents from Firestore
+        students_ref = db.collection("students")
+        students = [doc.to_dict() for doc in students_ref.stream()]
+        return {"students": students}, 200
+    except Exception as e:
+        return {"error": str(e)}, 500
