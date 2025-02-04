@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, {{ student['StudentName'] }}!</h1>
+    <p>Email: {{ student['Email'] }}</p>
+    <p>Diploma: {{ student['DiplomaStudy'] }}</p>
+    <p>Entry Year: {{ student['EntryYear'] }}</p>
+    <p>Points: {{ student['Points'] }}</p>
+</body>
+<h2>Redeemable Items</h2>
+<ul>
+    {% for item in items %}
+    <li>{{ item['Name'] }} - {{ item['Value'] }} Points (Stock: {{ item['Quantity'] }})
+        <form action="{{ url_for('redeem') }}" method="POST">
+            <input type="hidden" name="student_id" value="{{ student['id'] }}">
+            <input type="hidden" name="item_name" value="{{ item['id'] }}">  <!-- Firestore document ID -->
+            <button type="submit">Redeem</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+</html>
