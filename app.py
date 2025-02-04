@@ -6,10 +6,8 @@ from firebase_admin import credentials, firestore
 service_account_path = "path/to/serviceAccountKey.json"
 
 # Initialize Firebase Admin SDK
-cred = credentials.Certificate(service_account_path)
-firebase_admin.initialize_app(cred, {
-    "databaseURL": "https://devops-team4-default-rtdb.firebaseio.com"
-})
+cred = credentials.Certificate("firebase_credentials.json")
+firebase_admin.initialize_app(cred)
 
 # Firestore client
 db = firestore.client()
