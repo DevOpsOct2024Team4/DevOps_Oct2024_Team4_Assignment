@@ -1,10 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import firebase_admin
 from firebase_admin import credentials, firestore
+import requests
+import os
 
-# Use the new JSON credentials file
-cred = credentials.Certificate("firebase_credentials.json")
-firebase_admin.initialize_app(cred)
+# Load Firebase credentials from the secure folder
+cred_path = os.path.join(os.path.dirname(__file__), 'config', 'firebase_credentials.json')
+
+# Initialize Firebase only if it's not already initialized
+if not firebase_admin._apps:
+    cred = credentials.Certificate(cred_path)
+    firebase_admin.initialize_app(cred)
 
 # Firestore client
 db = firestore.client()
@@ -86,49 +92,48 @@ def student_dashboard(student_id):
 
 @app.route("/redeem", methods=["POST"])
 def redeem():
-    """Handle item redemption by students."""
     student_id = request.form.get("student_id")
-    item_id = request.form.get("item_name")  # Use Firestore doc ID
+    item_id = request.form.get("item_name")
 
-    print(f"🔍 Debug: Attempting to redeem {item_id} for student {student_id}")
-
-    if not student_id or not item_id:
-        print("❌ ERROR: Missing student ID or item ID")
-        return "Invalid request!", 400
-
-    # Fetch student and item from Firestore
     student_ref = db.collection("students").document(student_id)
     student_doc = student_ref.get()
 
     item_ref = db.collection("redeemable_items").document(item_id)
     item_doc = item_ref.get()
 
-    if not student_doc.exists:
-        print("❌ ERROR: Student not found!")
-        return "Student not found!", 404
-
-    if not item_doc.exists:
-        print("❌ ERROR: Item not found!")
-        return "Item not found!", 404
+    if not student_doc.exists or not item_doc.exists:
+        return "Invalid request!", 400
 
     student = student_doc.to_dict()
     item = item_doc.to_dict()
 
-    print(f"🎯 Before Redemption: Student Points = {student['Points']}, Item Stock = {item['Quantity']}")
-
     if student["Points"] >= item["Value"] and item["Quantity"] > 0:
         # Deduct points and reduce stock
-        student_ref.update({"Points": student["Points"] - item["Value"]})
-        item_ref.update({"Quantity": item["Quantity"] - 1})
+        new_points = student["Points"] - item["Value"]
+        new_stock = item["Quantity"] - 1
 
-        print(f"✅ Redemption Successful! New Points = {student['Points'] - item['Value']}, New Stock = {item['Quantity'] - 1}")
+        student_ref.update({"Points": new_points})
+        item_ref.update({"Quantity": new_stock})
+
+        # ✅ Send Discord Webhook
+        webhook_url = "https://discord.com/api/webhooks/1337845678264549458/gqSqmxx9dQ44faBRttjkSgtawhWW2ChCq6hLTBwnqOudvKhcOtCRoeG5BdWvhVNBGaDG"
+        discord_message = {
+            "content": f"🎯 **Redemption Alert!**\nStudent **{student['StudentName']}** redeemed **{item['Name']}** for **{item['Value']} points**.\nPoints Left: **{new_points}**, Stock Remaining: **{new_stock}**."
+        }
+        try:
+            response = requests.post(webhook_url, json=discord_message)
+            if response.status_code == 204:
+                print("✅ Discord notification sent!")
+            else:
+                print(f"❌ Failed to send Discord notification. Status code: {response.status_code}")
+        except Exception as e:
+            print(f"❌ Discord Webhook Error: {e}")
+
         return "Redemption Successful!", 200
     else:
-        print("❌ ERROR: Insufficient points or item out of stock!")
         return "Insufficient points or item out of stock!", 400
 
 
-    return redirect(url_for("student_dashboard", student_id=student_id))
 
 if __name__ == "__main__":
     app.run(debug=True)
