@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import firebase_admin
 from firebase_admin import credentials, firestore
+from functools import wraps
 import requests
 import os
 
@@ -19,17 +20,14 @@ db = firestore.client()
 app = Flask(__name__, template_folder="templates")
 app.secret_key = "DevOps_key_Team4"
 
-@app.route("/test_firebase")
-def test_firebase():
-    try:
-        print("Fetching students from Firestore...")
-        students_ref = db.collection("students").stream()
-        students = [doc.to_dict() for doc in students_ref]
-        print("Students Retrieved:", students)  # Debug log
-        return {"students": students}, 200
-    except Exception as e:
-        print("🔥 Firebase Error:", str(e))  # Debug log
-        return {"error": str(e)}, 500
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'role' not in session or session['role'] != 'admin':
+            flash("Access denied: Admins only!", "danger")
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Discord Webhook Integration
 def send_discord_notification(message):
@@ -37,54 +35,49 @@ def send_discord_notification(message):
     data = {"content": message}
     requests.post(webhook_url, json=data)
 
-# Page Routes
-
-@app.route("/check_firebase")
-def check_firebase():
-    try:
-        if db:
-            return {"message": "Firebase is connected!"}, 200
-        else:
-            return {"error": "Firebase is NOT initialized!"}, 500
-    except Exception as e:
-        return {"error": str(e)}, 500
-
-
-@app.route("/")    # Landing Page
+@app.route("/")    
 def home():
-    """Landing page."""
     return render_template("index.html")
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == "POST":
-        email = request.form.get("Email")
-        password = request.form.get("Password")
+    if request.method == 'POST':
+        email = request.form.get('Email')
+        password = request.form.get('Password')
 
-        try:
-            # Fetch student record from Firestore
-            students_ref = db.collection('students').where('Email', '==', email).stream()
+        # Check Students Collection
+        students_ref = db.collection('students')
+        student_query = students_ref.where('Email', '==', email).where('Password', '==', password).stream()
 
-            for doc in students_ref:
-                student_data = doc.to_dict()
+        student = None
+        for doc in student_query:
+            student = doc.to_dict()
+            student['id'] = doc.id
+            break
 
-                # Check if the password matches
-                if student_data.get("Password") == password:
-                    session["user_id"] = doc.id
-                    flash("Logged in successfully!", "success")
-                    return redirect(url_for("student_dashboard", student_id=doc.id))
-                else:
-                    flash("Invalid password.", "danger")
-                    return redirect(url_for("login"))
+        if student:
+            session['user_id'] = student['id']
+            session['role'] = 'student'
+            return redirect(url_for('student_dashboard', student_id=student['id']))
 
-            flash("Email not found.", "danger")
-            return redirect(url_for("login"))
+        # Check Admins Collection if student not found
+        admins_ref = db.collection('admins')
+        admin_query = admins_ref.where('Email', '==', email).where('Password', '==', password).stream()
 
-        except Exception as e:
-            print(f"Error: {e}")
-            flash(f"An error occurred: {str(e)}", "danger")
+        admin = None
+        for doc in admin_query:
+            admin = doc.to_dict()
+            admin['id'] = doc.id
+            break
 
-    return render_template("login.html")
+        if admin:
+            session['user_id'] = admin['id']
+            session['role'] = 'admin'
+            return redirect(url_for('admin_dashboard'))
+
+        flash("Invalid email or password.", "danger")
+
+    return render_template('login.html')
 
 
 @app.route('/recover_password', methods=['GET', 'POST'])
@@ -117,26 +110,16 @@ def recover_password():
     return render_template('recover_password.html')
 
 
-@app.route("/admin")    # Admin Page
+@app.route('/admin')
+@admin_required
 def admin_dashboard():
-    """Admin dashboard to manage students and items."""
-    try:
-        # Fetch student data from Firestore
-        students_ref = db.collection("students").stream()
-        students = [{**doc.to_dict(), 'id': doc.id} for doc in students_ref]  # Add the document ID
-
-        # Fetch redeemable items from Firestore
-        items_ref = db.collection("redeemable_items").stream()
-        redeemable_items = [{"id": doc.id, **doc.to_dict()} for doc in items_ref]  # Include Firestore doc ID
-
-        return render_template("admin.html", students=students, items=redeemable_items)
-
-    except Exception as e:
-        print(f"🔥 Error fetching data for Admin Dashboard: {e}")
-        return "Error loading admin dashboard", 500
+    students = [{**doc.to_dict(), 'id': doc.id} for doc in db.collection('students').stream()]
+    items = [{**doc.to_dict(), 'id': doc.id} for doc in db.collection('redeemable_items').stream()]
+    return render_template('admin.html', students=students, items=items)
 
 
 @app.route('/admin/create-student', methods=['GET', 'POST'])
+@admin_required
 def create_student():
     if request.method == 'POST':
         student_id = request.form.get('student_id')
@@ -180,18 +163,21 @@ def modify_student(student_id):
 
     return render_template('modify_student.html', student=student)
 
-@app.route('/admin/delete-student/<student_id>', methods=['GET'])
-def delete_student(student_id):
-    student_ref = db.collection('students').document(student_id)
+@app.route("/student/<student_id>")
+def student_dashboard(student_id):
+    student_ref = db.collection("students").document(student_id)
     student_doc = student_ref.get()
 
-    if not student_doc.exists:
-        flash('Student not found!', 'danger')
-    else:
-        student_ref.delete()
-        send_discord_notification(f'❌ Student {student_id} deleted.')
-        flash('Student account deleted successfully!', 'success')
+    if student_doc.exists:
+        student = student_doc.to_dict()
+        student["id"] = student_id  
 
+        items_ref = db.collection("redeemable_items").stream()
+        redeemable_items = [{"id": doc.id, **doc.to_dict()} for doc in items_ref]  
+
+        return render_template("student.html", student=student, items=redeemable_items)
+    else:
+        return "Student not found", 404
     return redirect(url_for('list_students'))
 
 @app.route('/admin/list-students', methods=['GET'])
@@ -258,7 +244,7 @@ def delete_item(item_id):
 
     return redirect(url_for('manage_items'))
 
-@app.route("/student/<student_id>")
+@app.route("/student/<student_id>", endpoint='student_dashboard_view')
 def student_dashboard(student_id):
     student_ref = db.collection("students").document(student_id)
     student_doc = student_ref.get()
@@ -318,6 +304,11 @@ def redeem():
     else:
         return "Insufficient points or item out of stock!", 400
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash("Logged out successfully.", "info")
+    return redirect(url_for('login'))
 
 
 if __name__ == "__main__":
