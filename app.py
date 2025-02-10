@@ -115,7 +115,7 @@ def redeem():
         student_ref.update({"Points": new_points})
         item_ref.update({"Quantity": new_stock})
 
-        # ✅ Send Discord Webhook
+        # Send Discord Webhook
         webhook_url = "https://discord.com/api/webhooks/1337845678264549458/gqSqmxx9dQ44faBRttjkSgtawhWW2ChCq6hLTBwnqOudvKhcOtCRoeG5BdWvhVNBGaDG"
         discord_message = {
             "content": f"🎯 **Redemption Alert!**\nStudent **{student['StudentName']}** redeemed **{item['Name']}** for **{item['Value']} points**.\nPoints Left: **{new_points}**, Stock Remaining: **{new_stock}**."
@@ -123,11 +123,11 @@ def redeem():
         try:
             response = requests.post(webhook_url, json=discord_message)
             if response.status_code == 204:
-                print("✅ Discord notification sent!")
+                print("Discord notification sent!")
             else:
-                print(f"❌ Failed to send Discord notification. Status code: {response.status_code}")
+                print(f"Failed to send Discord notification. Status code: {response.status_code}")
         except Exception as e:
-            print(f"❌ Discord Webhook Error: {e}")
+            print(f"Discord Webhook Error: {e}")
 
         return "Redemption Successful!", 200
     else:

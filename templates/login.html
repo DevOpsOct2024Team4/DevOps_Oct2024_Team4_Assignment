@@ -53,13 +53,13 @@
         {% endif %}
     {% endwith %}
 
-    <!-- ✅ Login Form -->
+    <!-- Login Form -->
     <form method="POST" action="/login">
         <label>Email:</label>
-        <input type="email" name="Email" required><br>
+        <input type="email" id="email" name="Email" required><br>
 
         <label>Password:</label>
-        <input type="password" name="Password" required><br>
+        <input type="password" id="password" name="Password" required><br>
 
         <button type="submit">Login</button>
     </form>
