@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 import firebase_admin
 from firebase_admin import credentials, firestore
 from functools import wraps
+from datetime import datetime
 import requests
 import os
 
@@ -28,6 +29,18 @@ def admin_required(f):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
+
+# Function to log audit actions
+def log_audit_action(action, details):
+    admin_name = session.get('admin_name', 'Unknown Admin')
+    audit_ref = db.collection('audit_logs')
+    log_data = {
+        'admin_name': admin_name,
+        'action': action,
+        'details': details,
+        'timestamp': datetime.utcnow()
+    }
+    audit_ref.add(log_data)
 
 # Discord Webhook Integration
 def send_discord_notification(message):
@@ -72,6 +85,7 @@ def login():
 
         if admin:
             session['user_id'] = admin['id']
+            session['admin_name'] = admin['Name']
             session['role'] = 'admin'
             return redirect(url_for('admin_dashboard'))
 
@@ -115,7 +129,9 @@ def recover_password():
 def admin_dashboard():
     students = [{**doc.to_dict(), 'id': doc.id} for doc in db.collection('students').stream()]
     items = [{**doc.to_dict(), 'id': doc.id} for doc in db.collection('redeemable_items').stream()]
-    return render_template('admin.html', students=students, items=items)
+    audit_logs = [{**doc.to_dict(), 'id': doc.id} for doc in db.collection('audit_logs').order_by('timestamp', direction=firestore.Query.DESCENDING).stream()]
+    
+    return render_template('admin.html', students=students, items=items, audit_logs=audit_logs)
 
 
 @app.route('/admin/create-student', methods=['GET', 'POST'])
@@ -132,36 +148,75 @@ def create_student():
             'EntryYear': int(request.form.get('entry_year'))
         }
         db.collection('students').document(student_id).set(student_data)
+        
+        # Send Discord notification
         send_discord_notification(f'📝 New student created: {student_data["StudentName"]}')
+        
+        # Log the action
+        admin_id = session.get('user_id')
+        log_audit_action('create_student', f'Created student {student_data["StudentName"]}')
+        
         flash('Student account created successfully!', 'success')
         return redirect(url_for('list_students'))
 
     return render_template('create_student.html')
 
+@app.route('/admin/delete-student/<student_id>', methods=['POST'])
+@admin_required
+def delete_student(student_id):
+    student_ref = db.collection('students').document(student_id)
+    student = student_ref.get()
+
+    if student.exists:
+        student_name = student.to_dict().get('StudentName', 'Unknown')
+        student_ref.delete()
+
+        # Send Discord notification
+        send_discord_notification(f'❌ Student {student_id} ({student_name}) deleted.')
+
+        # Log the action
+        admin_id = session.get('user_id')
+        log_audit_action('delete_student', f'Deleted student {student_name}')
+
+        flash('Student account deleted successfully!', 'success')
+    else:
+        flash('Student not found!', 'danger')
+
+    return redirect(url_for('list_students'))
+
 @app.route('/admin/modify-student/<student_id>', methods=['GET', 'POST'])
+@admin_required
 def modify_student(student_id):
     student_ref = db.collection('students').document(student_id)
-    student_doc = student_ref.get()
+    student = student_ref.get()
 
-    if not student_doc.exists:
+    if not student.exists:
         flash('Student not found!', 'danger')
         return redirect(url_for('list_students'))
-
-    student = student_doc.to_dict()
 
     if request.method == 'POST':
         updated_data = {
             'StudentName': request.form.get('student_name'),
             'Email': request.form.get('email'),
-            'EntryYear': int(request.form.get('entry_year')),
-            'Points': int(request.form.get('points'))
+            'Password': request.form.get('password'),
+            'Points': int(request.form.get('points')),
+            'DiplomaStudy': request.form.get('diploma_study'),
+            'EntryYear': int(request.form.get('entry_year'))
         }
         student_ref.update(updated_data)
-        send_discord_notification(f'✏️ Student {student_id} modified.')
+
+        # Send Discord notification
+        send_discord_notification(f'✏️ Student {updated_data["StudentName"]} modified.')
+
+        # Log the action
+        admin_id = session.get('user_id')
+        log_audit_action('modify_student', f'Modified student {updated_data["StudentName"]}')
+
         flash('Student account updated successfully!', 'success')
         return redirect(url_for('list_students'))
 
-    return render_template('modify_student.html', student=student)
+    return render_template('modify_student.html', student=student.to_dict(), student_id=student_id)
+
 
 @app.route("/student/<student_id>")
 def student_dashboard(student_id):
@@ -204,43 +259,52 @@ def search_student():
     return render_template('list_students.html', students=results)
 
 @app.route('/admin/manage-items', methods=['GET', 'POST'])
+@admin_required
 def manage_items():
-    items_ref = db.collection('redeemable_items').stream()
-    items = [{**doc.to_dict(), 'id': doc.id} for doc in items_ref]
+    items_ref = db.collection('redeemable_items')
 
     if request.method == 'POST':
         item_id = request.form.get('item_id')
         item_data = {
-            'Name': request.form.get('item_name'),
-            'Quantity': int(request.form.get('quantity')),
-            'Value': int(request.form.get('value'))
+            'ItemName': request.form.get('item_name'),
+            'PointsCost': int(request.form.get('points_cost')),
+            'Stock': int(request.form.get('stock'))
         }
+        items_ref.document(item_id).set(item_data)
 
-        if item_id:  # Update if item_id exists
-            db.collection('redeemable_items').document(item_id).update(item_data)
-            send_discord_notification(f'🔄 Item {item_id} updated.')
-            flash('Item updated successfully!', 'success')
-        else:  # Otherwise, create new item
-            new_item_ref = db.collection('redeemable_items').document()
-            new_item_ref.set(item_data)
-            send_discord_notification(f'🎁 New item created: {item_data["Name"]}')
-            flash('Item created successfully!', 'success')
+        # Send Discord notification
+        send_discord_notification(f'🎁 New item created: {item_data["ItemName"]}')
 
+        # Log the action
+        admin_id = session.get('user_id')
+        log_audit_action('create_item', f'Created item {item_data["ItemName"]}')
+
+        flash('Item created successfully!', 'success')
         return redirect(url_for('manage_items'))
 
+    items = [{**doc.to_dict(), 'id': doc.id} for doc in items_ref.stream()]
     return render_template('manage_items.html', items=items)
 
-@app.route('/admin/delete-item/<item_id>', methods=['GET'])
+@app.route('/admin/delete-item/<item_id>', methods=['POST'])
+@admin_required
 def delete_item(item_id):
     item_ref = db.collection('redeemable_items').document(item_id)
-    item_doc = item_ref.get()
+    item = item_ref.get()
 
-    if not item_doc.exists:
-        flash('Item not found!', 'danger')
-    else:
+    if item.exists:
+        item_name = item.to_dict().get('ItemName', 'Unknown')
         item_ref.delete()
-        send_discord_notification(f'🗑️ Item {item_id} deleted.')
+
+        # Send Discord notification
+        send_discord_notification(f'🗑️ Item {item_id} ({item_name}) deleted.')
+
+        # Log the action
+        admin_id = session.get('user_id')
+        log_audit_action('delete_item', f'Deleted item {item_name}')
+
         flash('Item deleted successfully!', 'success')
+    else:
+        flash('Item not found!', 'danger')
 
     return redirect(url_for('manage_items'))
 

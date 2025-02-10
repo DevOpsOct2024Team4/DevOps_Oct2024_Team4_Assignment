@@ -52,5 +52,26 @@
             <li><a href="/admin/manage-items">Manage Redeemable Items</a></li>
         </ul>
     </nav>
+    
+    <!-- Audit Log Section -->
+    <section style="background-color: white; padding: 20px; margin: 20px; border-radius: 8px;">
+        <h2>Audit Log</h2>
+        <table border="1" style="width: 80%; margin: auto; border-collapse: collapse;">
+            <tr style="background-color: #007bff; color: white;">
+                <th>Timestamp</th>
+                <th>Admin Name</th>
+                <th>Action</th>
+                <th>Details</th>
+            </tr>
+            {% for log in audit_logs %}
+            <tr>
+                <td>{{ log.timestamp }}</td>
+                <td>{{ log.admin_name }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.details }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </section>
 </body>
 </html>
