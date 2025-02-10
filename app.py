@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 import firebase_admin
 from firebase_admin import credentials, firestore
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests
 import os
 
@@ -20,6 +20,12 @@ db = firestore.client()
 # Initialize the Flask app (Keep only one instance)
 app = Flask(__name__, template_folder="templates")
 app.secret_key = "DevOps_key_Team4"
+app.permanent_session_lifetime = timedelta(minutes=5)
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    session.modified = True
 
 def admin_required(f):
     @wraps(f)
@@ -371,7 +377,7 @@ def redeem():
 @app.route('/logout')
 def logout():
     session.clear()
-    flash("Logged out successfully.", "info")
+    flash("You have been logged out.", "info")
     return redirect(url_for('login'))
 
 
