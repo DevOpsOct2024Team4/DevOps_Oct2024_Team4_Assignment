@@ -2,27 +2,90 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modify Student Account</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            margin: 0;
+        }
+        form {
+            width: 50%;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        a.back {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        a.back:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <h1>Modify Student Account</h1>
 
     <form action="/admin/modify-student/{{ student.id }}" method="POST">
         <label for="student_name">Student Name:</label>
-        <input type="text" name="student_name" value="{{ student.StudentName }}" required><br>
+        <input type="text" name="student_name" value="{{ student.StudentName }}" required>
 
         <label for="email">Email:</label>
-        <input type="email" name="email" value="{{ student.Email }}" required><br>
+        <input type="email" name="email" value="{{ student.Email }}" required>
 
         <label for="entry_year">Entry Year:</label>
-        <input type="number" name="entry_year" value="{{ student.EntryYear }}" required><br>
+        <input type="number" name="entry_year" value="{{ student.EntryYear }}" required>
 
         <label for="points">Points:</label>
-        <input type="number" name="points" value="{{ student.Points }}" required><br>
+        <input type="number" name="points" value="{{ student.Points }}" required>
 
         <button type="submit">Update Student</button>
     </form>
 
-    <a href="/admin/list-students">Back to List</a>
+    <a href="/admin/list-students" class="back">Back to List</a>
 </body>
 </html>

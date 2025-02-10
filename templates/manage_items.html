@@ -2,12 +2,115 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Redeemable Items</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1, h2 {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            margin: 0;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        td a {
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+            margin: 2px;
+        }
+        td a:first-child {
+            background-color: #28a745;
+            color: white;
+        }
+        td a:last-child {
+            background-color: #dc3545;
+            color: white;
+        }
+        td a:hover {
+            opacity: 0.8;
+        }
+        form {
+            width: 50%;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        a.back {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        a.back:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <h1>Manage Redeemable Items</h1>
 
-    <table border="1">
+    <table>
         <tr>
             <th>Item Name</th>
             <th>Quantity</th>
@@ -20,7 +123,7 @@
             <td>{{ item.Quantity }}</td>
             <td>{{ item.Value }}</td>
             <td>
-                <a href="/admin/modify-item/{{ item.id }}">Modify</a> |
+                <a href="/admin/modify-item/{{ item.id }}">Modify</a>
                 <a href="/admin/delete-item/{{ item.id }}">Delete</a>
             </td>
         </tr>
@@ -30,17 +133,21 @@
     <h2>Add New Item</h2>
     <form action="/admin/manage-items" method="POST">
         <label for="item_name">Item Name:</label>
-        <input type="text" name="item_name" required><br>
+        <input type="text" name="item_name" required>
 
         <label for="quantity">Quantity:</label>
-        <input type="number" name="quantity" required><br>
+        <input type="number" name="quantity" required>
 
         <label for="value">Value:</label>
-        <input type="number" name="value" required><br>
+        <input type="number" name="value" required>
 
         <button type="submit">Add Item</button>
     </form>
 
-    <a href="/admin">Back to Dashboard</a>
+    <a href="/admin" class="back">Back to Dashboard</a>
+    <br>
+    <br>
+    <br>
+    <br>
 </body>
 </html>

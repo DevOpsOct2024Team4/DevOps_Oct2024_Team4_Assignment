@@ -2,12 +2,79 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>List of Students</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            margin: 0;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        td a {
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+            margin: 2px;
+        }
+        td a:first-child {
+            background-color: #28a745;
+            color: white;
+        }
+        td a:last-child {
+            background-color: #dc3545;
+            color: white;
+        }
+        td a:hover {
+            opacity: 0.8;
+        }
+        a.back {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        a.back:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <h1>All Student Accounts</h1>
 
-    <table border="1">
+    <table>
         <tr>
             <th>Student ID</th>
             <th>Name</th>
@@ -22,13 +89,13 @@
             <td>{{ student.Email }}</td>
             <td>{{ student.Points }}</td>
             <td>
-                <a href="/admin/modify-student/{{ student.id }}">Modify</a> |
+                <a href="/admin/modify-student/{{ student.id }}">Modify</a>
                 <a href="/admin/delete-student/{{ student.id }}">Delete</a>
             </td>
         </tr>
         {% endfor %}
     </table>
 
-    <a href="/admin">Back to Dashboard</a>
+    <a href="/admin" class="back">Back to Dashboard</a>
 </body>
 </html>
