@@ -31,6 +31,11 @@ def test_firebase():
         print("🔥 Firebase Error:", str(e))  # Debug log
         return {"error": str(e)}, 500
 
+# Discord Webhook Integration
+def send_discord_notification(message):
+    webhook_url = 'https://discord.com/api/webhooks/1338542484036386969/16kfW53a89Nu-a-MWf5Q8Rmfog8iS_My6PQkeVY8kRNf01Amt3n6-JAtWIE-XgnK7tGL'
+    data = {"content": message}
+    requests.post(webhook_url, json=data)
 
 # Page Routes
 
@@ -56,17 +61,61 @@ def login():
         email = request.form.get("Email")
         password = request.form.get("Password")
 
-        # Debugging
-        print(f"DEBUG: Email - {email}, Password - {password}")
+        try:
+            # Fetch student record from Firestore
+            students_ref = db.collection('students').where('Email', '==', email).stream()
 
-        # Dummy validation for now (replace with Firebase auth later)
-        if email == "john.tan.2024@example.edu" and password == "Johntan111":
-            session["user_id"] = "A1234567X"
-            return redirect(url_for("student_dashboard", student_id="A1234567X"))
-        else:
-            flash("Invalid username or password", "danger")
+            for doc in students_ref:
+                student_data = doc.to_dict()
+
+                # Check if the password matches
+                if student_data.get("Password") == password:
+                    session["user_id"] = doc.id
+                    flash("Logged in successfully!", "success")
+                    return redirect(url_for("student_dashboard", student_id=doc.id))
+                else:
+                    flash("Invalid password.", "danger")
+                    return redirect(url_for("login"))
+
+            flash("Email not found.", "danger")
+            return redirect(url_for("login"))
+
+        except Exception as e:
+            print(f"Error: {e}")
+            flash(f"An error occurred: {str(e)}", "danger")
 
     return render_template("login.html")
+
+
+@app.route('/recover_password', methods=['GET', 'POST'])
+def recover_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        new_password = request.form.get('new_password')
+
+        try:
+            print(f"🔍 Trying to reset password for: {email}")  # Debugging line
+            students_ref = db.collection('students').where('Email', '==', email).stream()
+            student_found = False
+
+            for doc in students_ref:
+                student_id = doc.id
+                print(f"✅ Found student ID: {student_id}")  # Debugging line
+                db.collection('students').document(student_id).update({'Password': new_password})
+                student_found = True
+                send_discord_notification(f'🔑 Password updated for {email}')
+                flash('Password has been successfully updated!', 'success')
+                return redirect(url_for('login'))
+
+            if not student_found:
+                flash('No student found with the provided email.', 'danger')
+
+        except Exception as e:
+            print(f"❌ Error: {e}")  # Debugging line
+            flash(f"An error occurred: {str(e)}", 'danger')
+
+    return render_template('recover_password.html')
+
 
 @app.route("/admin")    # Admin Page
 def admin_dashboard():
