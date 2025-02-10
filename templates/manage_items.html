@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Redeemable Items</title>
+</head>
+<body>
+    <h1>Manage Redeemable Items</h1>
+
+    <table border="1">
+        <tr>
+            <th>Item Name</th>
+            <th>Quantity</th>
+            <th>Value</th>
+            <th>Actions</th>
+        </tr>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.Name }}</td>
+            <td>{{ item.Quantity }}</td>
+            <td>{{ item.Value }}</td>
+            <td>
+                <a href="/admin/modify-item/{{ item.id }}">Modify</a> |
+                <a href="/admin/delete-item/{{ item.id }}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Add New Item</h2>
+    <form action="/admin/manage-items" method="POST">
+        <label for="item_name">Item Name:</label>
+        <input type="text" name="item_name" required><br>
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" name="quantity" required><br>
+
+        <label for="value">Value:</label>
+        <input type="number" name="value" required><br>
+
+        <button type="submit">Add Item</button>
+    </form>
+
+    <a href="/admin">Back to Dashboard</a>
+</body>
+</html>

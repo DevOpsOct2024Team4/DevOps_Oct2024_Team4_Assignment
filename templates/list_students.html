@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Students</title>
+</head>
+<body>
+    <h1>All Student Accounts</h1>
+
+    <table border="1">
+        <tr>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Points</th>
+            <th>Actions</th>
+        </tr>
+        {% for student in students %}
+        <tr>
+            <td>{{ student.id }}</td>
+            <td>{{ student.StudentName }}</td>
+            <td>{{ student.Email }}</td>
+            <td>{{ student.Points }}</td>
+            <td>
+                <a href="/admin/modify-student/{{ student.id }}">Modify</a> |
+                <a href="/admin/delete-student/{{ student.id }}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <a href="/admin">Back to Dashboard</a>
+</body>
+</html>

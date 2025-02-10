@@ -71,7 +71,143 @@ def login():
 @app.route("/admin")    # Admin Page
 def admin_dashboard():
     """Admin dashboard to manage students and items."""
-    return render_template("admin.html", students=students, items=redeemable_items)
+    try:
+        # Fetch student data from Firestore
+        students_ref = db.collection("students").stream()
+        students = [{**doc.to_dict(), 'id': doc.id} for doc in students_ref]  # Add the document ID
+
+        # Fetch redeemable items from Firestore
+        items_ref = db.collection("redeemable_items").stream()
+        redeemable_items = [{"id": doc.id, **doc.to_dict()} for doc in items_ref]  # Include Firestore doc ID
+
+        return render_template("admin.html", students=students, items=redeemable_items)
+
+    except Exception as e:
+        print(f"🔥 Error fetching data for Admin Dashboard: {e}")
+        return "Error loading admin dashboard", 500
+
+
+@app.route('/admin/create-student', methods=['GET', 'POST'])
+def create_student():
+    if request.method == 'POST':
+        student_id = request.form.get('student_id')
+        student_data = {
+            'StudentName': request.form.get('student_name'),
+            'Email': request.form.get('email'),
+            'Password': request.form.get('password'),
+            'Points': int(request.form.get('points')),
+            'DiplomaStudy': request.form.get('diploma_study'),
+            'EntryYear': int(request.form.get('entry_year'))
+        }
+        db.collection('students').document(student_id).set(student_data)
+        send_discord_notification(f'📝 New student created: {student_data["StudentName"]}')
+        flash('Student account created successfully!', 'success')
+        return redirect(url_for('list_students'))
+
+    return render_template('create_student.html')
+
+@app.route('/admin/modify-student/<student_id>', methods=['GET', 'POST'])
+def modify_student(student_id):
+    student_ref = db.collection('students').document(student_id)
+    student_doc = student_ref.get()
+
+    if not student_doc.exists:
+        flash('Student not found!', 'danger')
+        return redirect(url_for('list_students'))
+
+    student = student_doc.to_dict()
+
+    if request.method == 'POST':
+        updated_data = {
+            'StudentName': request.form.get('student_name'),
+            'Email': request.form.get('email'),
+            'EntryYear': int(request.form.get('entry_year')),
+            'Points': int(request.form.get('points'))
+        }
+        student_ref.update(updated_data)
+        send_discord_notification(f'✏️ Student {student_id} modified.')
+        flash('Student account updated successfully!', 'success')
+        return redirect(url_for('list_students'))
+
+    return render_template('modify_student.html', student=student)
+
+@app.route('/admin/delete-student/<student_id>', methods=['GET'])
+def delete_student(student_id):
+    student_ref = db.collection('students').document(student_id)
+    student_doc = student_ref.get()
+
+    if not student_doc.exists:
+        flash('Student not found!', 'danger')
+    else:
+        student_ref.delete()
+        send_discord_notification(f'❌ Student {student_id} deleted.')
+        flash('Student account deleted successfully!', 'success')
+
+    return redirect(url_for('list_students'))
+
+@app.route('/admin/list-students', methods=['GET'])
+def list_students():
+    students_ref = db.collection('students').stream()
+    students = [{**doc.to_dict(), 'id': doc.id} for doc in students_ref]
+    return render_template('list_students.html', students=students)
+
+@app.route('/admin/search-student', methods=['GET'])
+def search_student():
+    query = request.args.get('query')
+    results = []
+    students_ref = db.collection('students')
+
+    # Search by Student ID
+    doc = students_ref.document(query).get()
+    if doc.exists:
+        results.append({**doc.to_dict(), 'id': doc.id})
+
+    # Search by Student Name
+    query_ref = students_ref.where('StudentName', '==', query).stream()
+    results.extend([{**doc.to_dict(), 'id': doc.id} for doc in query_ref])
+
+    return render_template('list_students.html', students=results)
+
+@app.route('/admin/manage-items', methods=['GET', 'POST'])
+def manage_items():
+    items_ref = db.collection('redeemable_items').stream()
+    items = [{**doc.to_dict(), 'id': doc.id} for doc in items_ref]
+
+    if request.method == 'POST':
+        item_id = request.form.get('item_id')
+        item_data = {
+            'Name': request.form.get('item_name'),
+            'Quantity': int(request.form.get('quantity')),
+            'Value': int(request.form.get('value'))
+        }
+
+        if item_id:  # Update if item_id exists
+            db.collection('redeemable_items').document(item_id).update(item_data)
+            send_discord_notification(f'🔄 Item {item_id} updated.')
+            flash('Item updated successfully!', 'success')
+        else:  # Otherwise, create new item
+            new_item_ref = db.collection('redeemable_items').document()
+            new_item_ref.set(item_data)
+            send_discord_notification(f'🎁 New item created: {item_data["Name"]}')
+            flash('Item created successfully!', 'success')
+
+        return redirect(url_for('manage_items'))
+
+    return render_template('manage_items.html', items=items)
+
+@app.route('/admin/delete-item/<item_id>', methods=['GET'])
+def delete_item(item_id):
+    item_ref = db.collection('redeemable_items').document(item_id)
+    item_doc = item_ref.get()
+
+    if not item_doc.exists:
+        flash('Item not found!', 'danger')
+    else:
+        item_ref.delete()
+        send_discord_notification(f'🗑️ Item {item_id} deleted.')
+        flash('Item deleted successfully!', 'success')
+
+    return redirect(url_for('manage_items'))
 
 @app.route("/student/<student_id>")
 def student_dashboard(student_id):
