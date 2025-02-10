@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 import firebase_admin
 from firebase_admin import credentials, firestore
 import requests
@@ -50,22 +50,22 @@ def home():
     """Landing page."""
     return render_template("index.html")
 
-@app.route("/login", methods=["GET", "POST"])    # Login Page
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    """Login page for both admin and students."""
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+        email = request.form.get("Email")
+        password = request.form.get("Password")
 
-        # To be replaced with authentication logic later on
-        if username and password:
-            # Redirect to different pages based on user type (Improve later on if neccessary)
-            if username == "admin":
-                return redirect(url_for("admin_dashboard"))
-            else:
-                return redirect(url_for("student_dashboard", student_id=username))
+        # Debugging
+        print(f"DEBUG: Email - {email}, Password - {password}")
+
+        # Dummy validation for now (replace with Firebase auth later)
+        if email == "john.tan.2024@example.edu" and password == "Johntan111":
+            session["user_id"] = "A1234567X"
+            return redirect(url_for("student_dashboard", student_id="A1234567X"))
         else:
-            flash("Invalid username or password")
+            flash("Invalid username or password", "danger")
+
     return render_template("login.html")
 
 @app.route("/admin")    # Admin Page
