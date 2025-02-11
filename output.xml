@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.1.1 (Python 3.12.4 on win32)" generated="2025-02-11T12:53:35.871763" rpa="false" schemaversion="5">
+<suite id="s1" name="Modifystudent" source="C:\Users\shawn\Downloads\Ngee Ann Poly\Year 3.2\DevOps\Assignment 1\DevOps_Oct2024_Team4_Assignment\modifystudent.robot">
+<test id="s1-t1" name="Modify Student Information" line="17">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2025-02-11T12:53:36.315364" level="INFO">Opening browser 'Chrome' to base url 'http://127.0.0.1:5000/login'.</msg>
+<arg>${URL}/login</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2025-02-11T12:53:36.315364" elapsed="1.891512"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2025-02-11T12:53:38.208387" level="INFO">Typing text 'hp@np.edu.sg' into text field 'name=Email'.</msg>
+<arg>name=Email</arg>
+<arg>${ADMIN_EMAIL}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T12:53:38.207382" elapsed="0.097838"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2025-02-11T12:53:38.306526" level="INFO">Typing text 'wizardboy' into text field 'name=Password'.</msg>
+<arg>name=Password</arg>
+<arg>${ADMIN_PASSWORD}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T12:53:38.305220" elapsed="0.067822"/>
+</kw>
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2025-02-11T12:53:38.374536" level="INFO">Clicking button 'xpath=//button[@type='submit']'.</msg>
+<arg>xpath=//button[@type='submit']</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T12:53:38.373042" elapsed="4.186042"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>Admin Dashboard</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2025-02-11T12:53:42.560077" elapsed="0.046331"/>
+</kw>
+<kw name="Click Link" owner="SeleniumLibrary">
+<msg time="2025-02-11T12:53:42.608408" level="INFO">Clicking link 'xpath=//a[contains(@href, '/admin/list-students')]'.</msg>
+<arg>xpath=//a[contains(@href, '/admin/list-students')]</arg>
+<doc>Clicks a link identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T12:53:42.607408" elapsed="0.634723"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>Student List</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2025-02-11T12:53:43.243130" elapsed="0.031210"/>
+</kw>
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2025-02-11T12:53:43.276349" level="INFO">Clicking element 'xpath=//tr[td[contains(text(), 'Hulk')]]//a[contains(@href, 'modify-student')]'.</msg>
+<arg>xpath=//tr[td[contains(text(), 'Hulk')]]//a[contains(@href, 'modify-student')]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T12:53:43.275348" elapsed="0.993644"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2025-02-11T12:53:44.270998" level="INFO">Typing text 'Hulk Updated' into text field 'name=student_name'.</msg>
+<arg>name=student_name</arg>
+<arg>${NEW_NAME}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T12:53:44.269992" elapsed="0.189550"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2025-02-11T12:53:44.460550" level="INFO">Typing text 'hulksmash@np.edu.sg' into text field 'name=email'.</msg>
+<arg>name=email</arg>
+<arg>${NEW_EMAIL}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T12:53:44.459542" elapsed="0.076801"/>
+</kw>
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2025-02-11T12:53:44.537342" level="INFO">Clicking button 'xpath=//button[@type='submit']'.</msg>
+<arg>xpath=//button[@type='submit']</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T12:53:44.537342" elapsed="3.111386"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>Student List</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2025-02-11T12:53:47.649728" elapsed="0.019117"/>
+</kw>
+<kw name="Page Should Contain" owner="SeleniumLibrary">
+<msg time="2025-02-11T12:53:47.698220" level="INFO">Current page contains text 'Hulk Updated'.</msg>
+<arg>${NEW_NAME}</arg>
+<doc>Verifies that current page contains ``text``.</doc>
+<status status="PASS" start="2025-02-11T12:53:47.669941" elapsed="0.029289"/>
+</kw>
+<kw name="Page Should Contain" owner="SeleniumLibrary">
+<msg time="2025-02-11T12:53:47.725453" level="INFO">Current page contains text 'hulksmash@np.edu.sg'.</msg>
+<arg>${NEW_EMAIL}</arg>
+<doc>Verifies that current page contains ``text``.</doc>
+<status status="PASS" start="2025-02-11T12:53:47.699230" elapsed="0.026223"/>
+</kw>
+<kw name="Run Process" owner="Process">
+<msg time="2025-02-11T12:53:47.727835" level="INFO">Starting process:
+python send_test_results.py "\"✅ Student Hulk Updated successfully modified.\""</msg>
+<msg time="2025-02-11T12:53:47.741142" level="INFO">Waiting for process to complete.</msg>
+<msg time="2025-02-11T12:53:50.205122" level="INFO">Process completed.</msg>
+<arg>python</arg>
+<arg>send_test_results.py</arg>
+<arg>"✅ Student ${NEW_NAME} successfully modified."</arg>
+<doc>Runs a process and waits for it to complete.</doc>
+<status status="PASS" start="2025-02-11T12:53:47.726586" elapsed="2.479553"/>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2025-02-11T12:53:50.207222" elapsed="2.294819"/>
+</kw>
+<doc>Verify that an admin can modify a student's details successfully.</doc>
+<status status="PASS" start="2025-02-11T12:53:36.313297" elapsed="16.190642"/>
+</test>
+<status status="PASS" start="2025-02-11T12:53:35.875091" elapsed="16.631703"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="1" fail="0" skip="0" id="s1" name="Modifystudent">Modifystudent</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
