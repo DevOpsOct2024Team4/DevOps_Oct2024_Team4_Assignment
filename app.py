@@ -377,7 +377,7 @@ def redeem():
         except Exception as e:
             print(f"Discord Webhook Error: {e}")
 
-        return "Redemption Successful!", 200
+        return f"Redemption Successful! Points Left: {new_points}", 200
     else:
         return "Insufficient points or item out of stock!", 400
 
