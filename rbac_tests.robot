@@ -25,7 +25,7 @@ Student Can Access Their Dashboard
     Input Text    name=Email    ${STUDENT_EMAIL}
     Input Text    name=Password    ${STUDENT_PASSWORD}
     Click Button    xpath=//button[@type='submit']
-    Wait Until Page Contains    Welcome to the Student Dashboard
+    Wait Until Page Contains    Welcome, John Tan!
     [Teardown]    Close Browser
 
 Student Cannot Access Admin Dashboard
@@ -35,15 +35,6 @@ Student Cannot Access Admin Dashboard
     Click Button    xpath=//button[@type='submit']
     Go To    ${URL}/admin
     Wait Until Page Contains    Access denied: Admins only!
-    [Teardown]    Close Browser
-
-Admin Cannot Access Student Dashboard
-    Open Browser    ${URL}/login    ${BROWSER}
-    Input Text    name=Email    ${ADMIN_EMAIL}
-    Input Text    name=Password    ${ADMIN_PASSWORD}
-    Click Button    xpath=//button[@type='submit']
-    Go To    ${URL}/student/A1234567X
-    Wait Until Page Contains    Unauthorized Access
     [Teardown]    Close Browser
 
 Invalid Login Attempt

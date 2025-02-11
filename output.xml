@@ -1,78 +1,196 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.1.1 (Python 3.12.4 on win32)" generated="2025-02-11T18:23:33.880393" rpa="false" schemaversion="5">
-<suite id="s1" name="Autologout" source="C:\Users\shawn\Downloads\Ngee Ann Poly\Year 3.2\DevOps\Assignment 1\DevOps_Oct2024_Team4_Assignment\autologout.robot">
-<test id="s1-t1" name="Verify Auto Logout After Inactivity" line="12">
+<robot generator="Robot 7.1.1 (Python 3.12.4 on win32)" generated="2025-02-11T18:31:34.743389" rpa="false" schemaversion="5">
+<suite id="s1" name="Rbac Tests" source="C:\Users\shawn\Downloads\Ngee Ann Poly\Year 3.2\DevOps\Assignment 1\DevOps_Oct2024_Team4_Assignment\rbac_tests.robot">
+<test id="s1-t1" name="Admin Can Access Admin Dashboard" line="15">
 <kw name="Open Browser" owner="SeleniumLibrary">
-<msg time="2025-02-11T18:23:34.379347" level="INFO">Opening browser 'Chrome' to base url 'http://127.0.0.1:5000/login'.</msg>
-<arg>${URL}</arg>
-<arg>Chrome</arg>
+<msg time="2025-02-11T18:31:35.174921" level="INFO">Opening browser 'Chrome' to base url 'http://127.0.0.1:5000/login'.</msg>
+<arg>${URL}/login</arg>
+<arg>${BROWSER}</arg>
 <doc>Opens a new browser instance to the optional ``url``.</doc>
-<status status="PASS" start="2025-02-11T18:23:34.378344" elapsed="1.754386"/>
+<status status="PASS" start="2025-02-11T18:31:35.174921" elapsed="1.762141"/>
 </kw>
 <kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2025-02-11T18:23:36.133882" level="INFO">Typing text 'hp@np.edu.sg' into text field 'id=email'.</msg>
-<arg>id=email</arg>
+<msg time="2025-02-11T18:31:36.938317" level="INFO">Typing text 'hp@np.edu.sg' into text field 'name=Email'.</msg>
+<arg>name=Email</arg>
 <arg>${ADMIN_EMAIL}</arg>
 <doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T18:23:36.132730" elapsed="0.104757"/>
+<status status="PASS" start="2025-02-11T18:31:36.937062" elapsed="0.094391"/>
 </kw>
 <kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2025-02-11T18:23:36.237487" level="INFO">Typing text 'wizardboy' into text field 'id=password'.</msg>
-<arg>id=password</arg>
+<msg time="2025-02-11T18:31:37.032464" level="INFO">Typing text 'wizardboy' into text field 'name=Password'.</msg>
+<arg>name=Password</arg>
 <arg>${ADMIN_PASSWORD}</arg>
 <doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T18:23:36.237487" elapsed="0.065298"/>
+<status status="PASS" start="2025-02-11T18:31:37.031453" elapsed="0.069524"/>
 </kw>
 <kw name="Click Button" owner="SeleniumLibrary">
-<msg time="2025-02-11T18:23:36.303814" level="INFO">Clicking button 'xpath=//button[@type='submit']'.</msg>
+<msg time="2025-02-11T18:31:37.100977" level="INFO">Clicking button 'xpath=//button[@type='submit']'.</msg>
 <arg>xpath=//button[@type='submit']</arg>
 <doc>Clicks the button identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T18:23:36.302785" elapsed="4.127398"/>
+<status status="PASS" start="2025-02-11T18:31:37.100977" elapsed="4.095935"/>
 </kw>
 <kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>Admin Dashboard</arg>
+<arg>Welcome to the Admin Dashboard</arg>
 <doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2025-02-11T18:23:40.431275" elapsed="0.022905"/>
+<status status="PASS" start="2025-02-11T18:31:41.197921" elapsed="0.028591"/>
 </kw>
-<kw name="Sleep" owner="BuiltIn">
-<msg time="2025-02-11T18:25:45.456555" level="INFO">Slept 2 minutes 5 seconds.</msg>
-<arg>${TIMEOUT}</arg>
-<doc>Pauses the test executed for the given time.</doc>
-<status status="PASS" start="2025-02-11T18:23:40.455181" elapsed="125.001885"/>
+<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2025-02-11T18:31:41.227567" elapsed="2.147021"/>
 </kw>
-<kw name="Page Should Contain" owner="SeleniumLibrary">
-<msg time="2025-02-11T18:25:45.495672" level="INFO">Current page contains text 'You have been logged out.'.</msg>
-<arg>You have been logged out.</arg>
-<doc>Verifies that current page contains ``text``.</doc>
-<status status="PASS" start="2025-02-11T18:25:45.457430" elapsed="0.038242"/>
+<status status="PASS" start="2025-02-11T18:31:35.172904" elapsed="8.201684"/>
+</test>
+<test id="s1-t2" name="Student Can Access Their Dashboard" line="23">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2025-02-11T18:31:43.380610" level="INFO">Opening browser 'Chrome' to base url 'http://127.0.0.1:5000/login'.</msg>
+<arg>${URL}/login</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2025-02-11T18:31:43.379600" elapsed="1.767960"/>
 </kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2025-02-11T18:31:45.148939" level="INFO">Typing text 'john.tan.2024@example.edu' into text field 'name=Email'.</msg>
+<arg>name=Email</arg>
+<arg>${STUDENT_EMAIL}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T18:31:45.148939" elapsed="0.133921"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2025-02-11T18:31:45.283928" level="INFO">Typing text 'Johntan222' into text field 'name=Password'.</msg>
+<arg>name=Password</arg>
+<arg>${STUDENT_PASSWORD}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T18:31:45.283928" elapsed="0.065586"/>
+</kw>
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2025-02-11T18:31:45.350525" level="INFO">Clicking button 'xpath=//button[@type='submit']'.</msg>
+<arg>xpath=//button[@type='submit']</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T18:31:45.349514" elapsed="1.632182"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>Welcome, John Tan!</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2025-02-11T18:31:46.982695" elapsed="0.014002"/>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2025-02-11T18:31:46.997696" elapsed="2.145581"/>
+</kw>
+<status status="PASS" start="2025-02-11T18:31:43.378599" elapsed="5.765595"/>
+</test>
+<test id="s1-t3" name="Student Cannot Access Admin Dashboard" line="31">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2025-02-11T18:31:49.148189" level="INFO">Opening browser 'Chrome' to base url 'http://127.0.0.1:5000/login'.</msg>
+<arg>${URL}/login</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2025-02-11T18:31:49.148189" elapsed="1.868496"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2025-02-11T18:31:51.017825" level="INFO">Typing text 'john.tan.2024@example.edu' into text field 'name=Email'.</msg>
+<arg>name=Email</arg>
+<arg>${STUDENT_EMAIL}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T18:31:51.017825" elapsed="0.214097"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2025-02-11T18:31:51.231922" level="INFO">Typing text 'Johntan222' into text field 'name=Password'.</msg>
+<arg>name=Password</arg>
+<arg>${STUDENT_PASSWORD}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T18:31:51.231922" elapsed="0.069022"/>
+</kw>
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2025-02-11T18:31:51.301952" level="INFO">Clicking button 'xpath=//button[@type='submit']'.</msg>
+<arg>xpath=//button[@type='submit']</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T18:31:51.301952" elapsed="1.606996"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-02-11T18:31:52.909946" level="INFO">Opening url 'http://127.0.0.1:5000/admin'</msg>
+<arg>${URL}/admin</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-02-11T18:31:52.909946" elapsed="0.040002"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>Access denied: Admins only!</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2025-02-11T18:31:52.950948" elapsed="0.012721"/>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2025-02-11T18:31:52.964694" elapsed="2.138606"/>
+</kw>
+<status status="PASS" start="2025-02-11T18:31:49.147191" elapsed="5.957157"/>
+</test>
+<test id="s1-t4" name="Invalid Login Attempt" line="40">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2025-02-11T18:31:55.108994" level="INFO">Opening browser 'Chrome' to base url 'http://127.0.0.1:5000/login'.</msg>
+<arg>${URL}/login</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2025-02-11T18:31:55.107985" elapsed="1.761009"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2025-02-11T18:31:56.869994" level="INFO">Typing text 'invalid@example.com' into text field 'name=Email'.</msg>
+<arg>name=Email</arg>
+<arg>invalid@example.com</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T18:31:56.869994" elapsed="0.120100"/>
+</kw>
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2025-02-11T18:31:56.990094" level="INFO">Typing text 'invalidpassword' into text field 'name=Password'.</msg>
+<arg>name=Password</arg>
+<arg>invalidpassword</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T18:31:56.990094" elapsed="0.067245"/>
+</kw>
+<kw name="Click Button" owner="SeleniumLibrary">
+<msg time="2025-02-11T18:31:57.058749" level="INFO">Clicking button 'xpath=//button[@type='submit']'.</msg>
+<arg>xpath=//button[@type='submit']</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<status status="PASS" start="2025-02-11T18:31:57.058749" elapsed="1.355341"/>
+</kw>
+<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
+<arg>Invalid email or password</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" start="2025-02-11T18:31:58.415209" elapsed="0.021978"/>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2025-02-11T18:31:58.438329" elapsed="2.120426"/>
+</kw>
+<status status="PASS" start="2025-02-11T18:31:55.106628" elapsed="5.453134"/>
+</test>
+<kw name="Run Keyword" owner="BuiltIn" type="TEARDOWN">
+<kw name="Send Test Results to Discord">
 <kw name="Run Process" owner="Process">
-<msg time="2025-02-11T18:25:45.496600" level="INFO">Starting process:
-python send_test_results.py "Auto-logout test completed successfully."</msg>
-<msg time="2025-02-11T18:25:45.511653" level="INFO">Waiting for process to complete.</msg>
-<msg time="2025-02-11T18:25:46.816863" level="INFO">Process completed.</msg>
+<msg time="2025-02-11T18:32:00.565761" level="INFO">Starting process:
+python send_test_results.py</msg>
+<msg time="2025-02-11T18:32:00.581314" level="INFO">Waiting for process to complete.</msg>
+<msg time="2025-02-11T18:32:02.117015" level="INFO">Process completed.</msg>
 <arg>python</arg>
 <arg>send_test_results.py</arg>
-<arg>Auto-logout test completed successfully.</arg>
 <doc>Runs a process and waits for it to complete.</doc>
-<status status="PASS" start="2025-02-11T18:25:45.496600" elapsed="1.320263"/>
+<status status="PASS" start="2025-02-11T18:32:00.564762" elapsed="1.553246"/>
 </kw>
-<kw name="Close Browser" owner="SeleniumLibrary">
-<doc>Closes the current browser.</doc>
-<status status="PASS" start="2025-02-11T18:25:46.817910" elapsed="2.258943"/>
+<status status="PASS" start="2025-02-11T18:32:00.564762" elapsed="1.553246"/>
 </kw>
-<status status="PASS" start="2025-02-11T18:23:34.377756" elapsed="134.701106"/>
-</test>
-<status status="PASS" start="2025-02-11T18:23:33.885448" elapsed="135.196661"/>
+<arg>Send Test Results to Discord</arg>
+<doc>Executes the given keyword with the given arguments.</doc>
+<status status="PASS" start="2025-02-11T18:32:00.563763" elapsed="1.554245"/>
+</kw>
+<status status="PASS" start="2025-02-11T18:31:34.744563" elapsed="27.373445"/>
 </suite>
 <statistics>
 <total>
-<stat pass="1" fail="0" skip="0">All Tests</stat>
+<stat pass="4" fail="0" skip="0">All Tests</stat>
 </total>
 <tag>
 </tag>
 <suite>
-<stat pass="1" fail="0" skip="0" id="s1" name="Autologout">Autologout</stat>
+<stat pass="4" fail="0" skip="0" id="s1" name="Rbac Tests">Rbac Tests</stat>
 </suite>
 </statistics>
 <errors>
