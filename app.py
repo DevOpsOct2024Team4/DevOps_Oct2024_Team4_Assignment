@@ -201,14 +201,16 @@ def modify_student(student_id):
         return redirect(url_for('list_students'))
 
     if request.method == 'POST':
+        # Ensure all fields are retrieved correctly
         updated_data = {
-            'StudentName': request.form.get('student_name'),
-            'Email': request.form.get('email'),
-            'Password': request.form.get('password'),
-            'Points': int(request.form.get('points')),
-            'DiplomaStudy': request.form.get('diploma_study'),
-            'EntryYear': int(request.form.get('entry_year'))
+            'StudentName': request.form.get('student_name', student.to_dict().get('StudentName')),
+            'Email': request.form.get('email', student.to_dict().get('Email')),
+            'Password': request.form.get('password', student.to_dict().get('Password')),
+            'Points': int(request.form.get('points', student.to_dict().get('Points', 0))),
+            'DiplomaStudy': request.form.get('diploma_study', student.to_dict().get('DiplomaStudy')),
+            'EntryYear': int(request.form.get('entry_year', student.to_dict().get('EntryYear', 0)))
         }
+
         student_ref.update(updated_data)
 
         # Send Discord notification
@@ -221,8 +223,7 @@ def modify_student(student_id):
         flash('Student account updated successfully!', 'success')
         return redirect(url_for('list_students'))
 
-    return render_template('modify_student.html', student=student.to_dict(), student_id=student_id)
-
+    return render_template('modify_student.html', student={**student.to_dict(), 'id': student_id}, student_id=student_id)
 
 @app.route("/student/<student_id>")
 def student_dashboard(student_id):
@@ -271,25 +272,31 @@ def manage_items():
 
     if request.method == 'POST':
         item_id = request.form.get('item_id')
+        points_cost = request.form.get('points_cost')
+        stock = request.form.get('stock')
+
+        # Handle NoneType and invalid input for PointsCost and Stock
         item_data = {
             'ItemName': request.form.get('item_name'),
-            'PointsCost': int(request.form.get('points_cost')),
-            'Stock': int(request.form.get('stock'))
+            'PointsCost': int(points_cost) if points_cost and points_cost.isdigit() else 0,
+            'Stock': int(stock) if stock and stock.isdigit() else 0
         }
+
         items_ref.document(item_id).set(item_data)
 
         # Send Discord notification
-        send_discord_notification(f'🎁 New item created: {item_data["ItemName"]}')
+        send_discord_notification(f'📦 New item created: {item_data["ItemName"]} (Cost: {item_data["PointsCost"]} points, Stock: {item_data["Stock"]})')
 
         # Log the action
         admin_id = session.get('user_id')
         log_audit_action('create_item', f'Created item {item_data["ItemName"]}')
 
-        flash('Item created successfully!', 'success')
+        flash('Item created successfully! ✔️', 'success')
         return redirect(url_for('manage_items'))
 
     items = [{**doc.to_dict(), 'id': doc.id} for doc in items_ref.stream()]
     return render_template('manage_items.html', items=items)
+
 
 @app.route('/admin/delete-item/<item_id>', methods=['POST'])
 @admin_required
@@ -302,11 +309,11 @@ def delete_item(item_id):
         item_ref.delete()
 
         # Send Discord notification
-        send_discord_notification(f'🗑️ Item {item_id} ({item_name}) deleted.')
+        send_discord_notification(f'🗑️ Item `{item_id}` ({item_name}) deleted.')
 
         # Log the action
         admin_id = session.get('user_id')
-        log_audit_action('delete_item', f'Deleted item {item_name}')
+        log_audit_action(action='delete_item', details=f'Deleted item {item_name}')
 
         flash('Item deleted successfully!', 'success')
     else:
