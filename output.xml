@@ -1,157 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.1.1 (Python 3.12.4 on win32)" generated="2025-02-11T17:47:33.096540" rpa="false" schemaversion="5">
-<suite id="s1" name="Itemtests" source="C:\Users\shawn\Downloads\Ngee Ann Poly\Year 3.2\DevOps\Assignment 1\DevOps_Oct2024_Team4_Assignment\itemtests.robot">
-<test id="s1-t1" name="Create, Modify, and Delete Item with Discord Notification" line="18">
+<robot generator="Robot 7.1.1 (Python 3.12.4 on win32)" generated="2025-02-11T18:23:33.880393" rpa="false" schemaversion="5">
+<suite id="s1" name="Autologout" source="C:\Users\shawn\Downloads\Ngee Ann Poly\Year 3.2\DevOps\Assignment 1\DevOps_Oct2024_Team4_Assignment\autologout.robot">
+<test id="s1-t1" name="Verify Auto Logout After Inactivity" line="12">
 <kw name="Open Browser" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:33.564039" level="INFO">Opening browser 'Chrome' to base url 'http://127.0.0.1:5000/login'.</msg>
+<msg time="2025-02-11T18:23:34.379347" level="INFO">Opening browser 'Chrome' to base url 'http://127.0.0.1:5000/login'.</msg>
 <arg>${URL}</arg>
 <arg>Chrome</arg>
 <doc>Opens a new browser instance to the optional ``url``.</doc>
-<status status="PASS" start="2025-02-11T17:47:33.564039" elapsed="1.941268"/>
+<status status="PASS" start="2025-02-11T18:23:34.378344" elapsed="1.754386"/>
 </kw>
 <kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:35.506307" level="INFO">Typing text 'hp@np.edu.sg' into text field 'id=email'.</msg>
+<msg time="2025-02-11T18:23:36.133882" level="INFO">Typing text 'hp@np.edu.sg' into text field 'id=email'.</msg>
 <arg>id=email</arg>
 <arg>${ADMIN_EMAIL}</arg>
 <doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T17:47:35.506307" elapsed="0.114604"/>
+<status status="PASS" start="2025-02-11T18:23:36.132730" elapsed="0.104757"/>
 </kw>
 <kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:35.621927" level="INFO">Typing text 'wizardboy' into text field 'id=password'.</msg>
+<msg time="2025-02-11T18:23:36.237487" level="INFO">Typing text 'wizardboy' into text field 'id=password'.</msg>
 <arg>id=password</arg>
 <arg>${ADMIN_PASSWORD}</arg>
 <doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T17:47:35.621927" elapsed="0.065514"/>
+<status status="PASS" start="2025-02-11T18:23:36.237487" elapsed="0.065298"/>
 </kw>
 <kw name="Click Button" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:35.687441" level="INFO">Clicking button 'xpath=//button[@type='submit']'.</msg>
+<msg time="2025-02-11T18:23:36.303814" level="INFO">Clicking button 'xpath=//button[@type='submit']'.</msg>
 <arg>xpath=//button[@type='submit']</arg>
 <doc>Clicks the button identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T17:47:35.687441" elapsed="4.193788"/>
+<status status="PASS" start="2025-02-11T18:23:36.302785" elapsed="4.127398"/>
 </kw>
 <kw name="Wait Until Page Contains" owner="SeleniumLibrary">
 <arg>Admin Dashboard</arg>
 <doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2025-02-11T17:47:39.882157" elapsed="0.036853"/>
+<status status="PASS" start="2025-02-11T18:23:40.431275" elapsed="0.022905"/>
 </kw>
-<kw name="Go To" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:39.921085" level="INFO">Opening url 'http://127.0.0.1:5000/admin/manage-items'</msg>
-<arg>http://127.0.0.1:5000/admin/manage-items</arg>
-<doc>Navigates the current browser window to the provided ``url``.</doc>
-<status status="PASS" start="2025-02-11T17:47:39.920082" elapsed="0.323008"/>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-02-11T18:25:45.456555" level="INFO">Slept 2 minutes 5 seconds.</msg>
+<arg>${TIMEOUT}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-02-11T18:23:40.455181" elapsed="125.001885"/>
 </kw>
-<kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:40.245382" level="INFO">Typing text 'test123' into text field 'name=item_id'.</msg>
-<arg>name=item_id</arg>
-<arg>test123</arg>
-<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T17:47:40.244373" elapsed="0.147782"/>
-</kw>
-<kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:40.393222" level="INFO">Typing text 'Test Item' into text field 'name=item_name'.</msg>
-<arg>name=item_name</arg>
-<arg>${ITEM_NAME}</arg>
-<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T17:47:40.393222" elapsed="0.064733"/>
-</kw>
-<kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:40.459027" level="INFO">Typing text '10' into text field 'name=quantity'.</msg>
-<arg>name=quantity</arg>
-<arg>${ITEM_QUANTITY}</arg>
-<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T17:47:40.459027" elapsed="0.055829"/>
-</kw>
-<kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:40.517309" level="INFO">Typing text '50' into text field 'name=value'.</msg>
-<arg>name=value</arg>
-<arg>${ITEM_VALUE}</arg>
-<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T17:47:40.516292" elapsed="0.055542"/>
-</kw>
-<kw name="Click Button" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:40.572834" level="INFO">Clicking button 'xpath=//button[text()='Add Item']'.</msg>
-<arg>xpath=//button[text()='Add Item']</arg>
-<doc>Clicks the button identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T17:47:40.572834" elapsed="2.374685"/>
-</kw>
-<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>${ITEM_NAME}</arg>
-<doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2025-02-11T17:47:42.948521" elapsed="0.019486"/>
-</kw>
-<kw name="Click Element" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:42.970195" level="INFO">Clicking element 'xpath=//tr[td[contains(., 'Test Item')]]//a[contains(text(), 'Modify')]'.</msg>
-<arg>xpath=//tr[td[contains(., '${ITEM_NAME}')]]//a[contains(text(), 'Modify')]</arg>
-<doc>Click the element identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T17:47:42.969106" elapsed="0.490279"/>
-</kw>
-<kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:43.460383" level="INFO">Typing text 'Updated Item' into text field 'name=item_name'.</msg>
-<arg>name=item_name</arg>
-<arg>${UPDATED_NAME}</arg>
-<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T17:47:43.460383" elapsed="0.216132"/>
-</kw>
-<kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:43.677515" level="INFO">Typing text '20' into text field 'name=quantity'.</msg>
-<arg>name=quantity</arg>
-<arg>${UPDATED_QUANTITY}</arg>
-<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T17:47:43.677515" elapsed="0.083569"/>
-</kw>
-<kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:43.762570" level="INFO">Typing text '75' into text field 'name=value'.</msg>
-<arg>name=value</arg>
-<arg>${UPDATED_VALUE}</arg>
-<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T17:47:43.761084" elapsed="0.170187"/>
-</kw>
-<kw name="Click Button" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:43.932265" level="INFO">Clicking button 'xpath=//button[text()='Update Item']'.</msg>
-<arg>xpath=//button[text()='Update Item']</arg>
-<doc>Clicks the button identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T17:47:43.932265" elapsed="3.216118"/>
-</kw>
-<kw name="Wait Until Page Contains" owner="SeleniumLibrary">
-<arg>${UPDATED_NAME}</arg>
-<doc>Waits until ``text`` appears on the current page.</doc>
-<status status="PASS" start="2025-02-11T17:47:47.149381" elapsed="0.023203"/>
-</kw>
-<kw name="Click Button" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:47.174865" level="INFO">Clicking button 'xpath=//tr[td[contains(., 'Updated Item')]]//form//button[contains(text(), 'Delete')]'.</msg>
-<arg>xpath=//tr[td[contains(., '${UPDATED_NAME}')]]//form//button[contains(text(), 'Delete')]</arg>
-<doc>Clicks the button identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-11T17:47:47.173752" elapsed="0.208834"/>
-</kw>
-<kw name="Handle Alert" owner="SeleniumLibrary">
-<msg time="2025-02-11T17:47:47.384591" level="INFO">HANDLE::&lt;class 'NoneType'&gt;::None</msg>
-<arg>action=ACCEPT</arg>
-<doc>Handles the current alert and returns its message.</doc>
-<status status="PASS" start="2025-02-11T17:47:47.383585" elapsed="0.012116"/>
-</kw>
-<kw name="Wait Until Page Does Not Contain" owner="SeleniumLibrary">
-<arg>${UPDATED_NAME}</arg>
-<doc>Waits until ``text`` disappears from the current page.</doc>
-<status status="PASS" start="2025-02-11T17:47:47.395701" elapsed="2.956933"/>
+<kw name="Page Should Contain" owner="SeleniumLibrary">
+<msg time="2025-02-11T18:25:45.495672" level="INFO">Current page contains text 'You have been logged out.'.</msg>
+<arg>You have been logged out.</arg>
+<doc>Verifies that current page contains ``text``.</doc>
+<status status="PASS" start="2025-02-11T18:25:45.457430" elapsed="0.038242"/>
 </kw>
 <kw name="Run Process" owner="Process">
-<msg time="2025-02-11T17:47:50.354647" level="INFO">Starting process:
-python send_test_results.py "Item creation, modification, and deletion test completed successfully."</msg>
-<msg time="2025-02-11T17:47:50.369196" level="INFO">Waiting for process to complete.</msg>
-<msg time="2025-02-11T17:47:51.743706" level="INFO">Process completed.</msg>
+<msg time="2025-02-11T18:25:45.496600" level="INFO">Starting process:
+python send_test_results.py "Auto-logout test completed successfully."</msg>
+<msg time="2025-02-11T18:25:45.511653" level="INFO">Waiting for process to complete.</msg>
+<msg time="2025-02-11T18:25:46.816863" level="INFO">Process completed.</msg>
 <arg>python</arg>
 <arg>send_test_results.py</arg>
-<arg>Item creation, modification, and deletion test completed successfully.</arg>
+<arg>Auto-logout test completed successfully.</arg>
 <doc>Runs a process and waits for it to complete.</doc>
-<status status="PASS" start="2025-02-11T17:47:50.353670" elapsed="1.390036"/>
+<status status="PASS" start="2025-02-11T18:25:45.496600" elapsed="1.320263"/>
 </kw>
 <kw name="Close Browser" owner="SeleniumLibrary">
 <doc>Closes the current browser.</doc>
-<status status="PASS" start="2025-02-11T17:47:51.744666" elapsed="2.231561"/>
+<status status="PASS" start="2025-02-11T18:25:46.817910" elapsed="2.258943"/>
 </kw>
-<status status="PASS" start="2025-02-11T17:47:33.563016" elapsed="20.414266"/>
+<status status="PASS" start="2025-02-11T18:23:34.377756" elapsed="134.701106"/>
 </test>
-<status status="PASS" start="2025-02-11T17:47:33.100003" elapsed="20.881395"/>
+<status status="PASS" start="2025-02-11T18:23:33.885448" elapsed="135.196661"/>
 </suite>
 <statistics>
 <total>
@@ -160,7 +72,7 @@ python send_test_results.py "Item creation, modification, and deletion test comp
 <tag>
 </tag>
 <suite>
-<stat pass="1" fail="0" skip="0" id="s1" name="Itemtests">Itemtests</stat>
+<stat pass="1" fail="0" skip="0" id="s1" name="Autologout">Autologout</stat>
 </suite>
 </statistics>
 <errors>
