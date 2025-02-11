@@ -288,6 +288,36 @@ def manage_items():
     items = [{**doc.to_dict(), 'id': doc.id} for doc in items_ref.stream()]
     return render_template('manage_items.html', items=items)
 
+@app.route('/admin/modify-item/<item_id>', methods=['GET', 'POST'])
+@admin_required
+def modify_item(item_id):
+    item_ref = db.collection('redeemable_items').document(item_id)
+    item = item_ref.get()
+
+    if not item.exists:
+        flash('Item not found!', 'danger')
+        return redirect(url_for('manage_items'))
+
+    if request.method == 'POST':
+        updated_data = {
+            'Name': request.form.get('item_name'),
+            'Quantity': int(request.form.get('quantity')),
+            'Value': int(request.form.get('value'))
+        }
+        item_ref.update(updated_data)
+
+        # Send Discord notification
+        send_discord_notification(f'✏️ Item {updated_data["Name"]} modified.')
+
+        # Log the action
+        admin_id = session.get('user_id')
+        log_audit_action('modify_item', f'Modified item {updated_data["Name"]}')
+
+        flash('Item updated successfully!', 'success')
+        return redirect(url_for('manage_items'))
+
+    return render_template('modify_item.html', item={**item.to_dict(), 'id': item_id})
+
 
 @app.route('/admin/delete-item/<item_id>', methods=['POST'])
 @admin_required

@@ -12,6 +12,7 @@ ${NEW_NAME}    Hulk Updated
 ${NEW_EMAIL}    hulksmash@np.edu.sg
 ${NEW_POINTS}    150
 ${NEW_YEAR}    2023
+${NEW_DIPLOMA}    CSF
 
 *** Test Cases ***
 Modify Student Information
@@ -33,6 +34,7 @@ Modify Student Information
     Click Element    xpath=//tr[td[contains(text(), 'Hulk')]]//a[contains(@href, 'modify-student')]
     Input Text    name=student_name    ${NEW_NAME}
     Input Text    name=email    ${NEW_EMAIL}
+    Input Text    name=diploma_study    ${NEW_DIPLOMA}
     Click Button    xpath=//button[@type='submit']
 
     # Step 4: Verify Update in Student List
