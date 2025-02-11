@@ -70,21 +70,27 @@
 <body>
     <h1>Modify Student Account</h1>
 
-    <form action="/admin/modify-student/{{ student.id }}" method="POST">
+    <form action="/admin/modify-student/{{ student_id }}" method="POST">
         <label for="student_name">Student Name:</label>
         <input type="text" name="student_name" value="{{ student.StudentName }}" required>
-
+    
         <label for="email">Email:</label>
         <input type="email" name="email" value="{{ student.Email }}" required>
-
+    
         <label for="entry_year">Entry Year:</label>
         <input type="number" name="entry_year" value="{{ student.EntryYear }}" required>
-
+    
+        <label for="password">Password:</label>
+        <input type="password" name="password" value="{{ student.Password }}" required>
+    
         <label for="points">Points:</label>
         <input type="number" name="points" value="{{ student.Points }}" required>
-
+    
+        <label for="diploma_study">Diploma of Study:</label>
+        <input type="text" name="diploma_study" value="{{ student.DiplomaStudy }}" required>
+    
         <button type="submit">Update Student</button>
-    </form>
+    </form>    
 
     <a href="/admin/list-students" class="back">Back to List</a>
 </body>

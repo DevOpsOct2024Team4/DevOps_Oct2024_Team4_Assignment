@@ -150,22 +150,19 @@ def create_student():
             'Email': request.form.get('email'),
             'Password': request.form.get('password'),
             'Points': int(request.form.get('points')),
-            'DiplomaStudy': request.form.get('diploma_study'),
+            'DiplomaStudy': request.form.get('diploma_study'),  # Added
             'EntryYear': int(request.form.get('entry_year'))
         }
         db.collection('students').document(student_id).set(student_data)
         
-        # Send Discord notification
         send_discord_notification(f'📝 New student created: {student_data["StudentName"]}')
-        
-        # Log the action
-        admin_id = session.get('user_id')
         log_audit_action('create_student', f'Created student {student_data["StudentName"]}')
         
         flash('Student account created successfully!', 'success')
         return redirect(url_for('list_students'))
 
     return render_template('create_student.html')
+
 
 @app.route('/admin/delete-student/<student_id>', methods=['POST'])
 @admin_required
@@ -201,23 +198,17 @@ def modify_student(student_id):
         return redirect(url_for('list_students'))
 
     if request.method == 'POST':
-        # Ensure all fields are retrieved correctly
         updated_data = {
-            'StudentName': request.form.get('student_name', student.to_dict().get('StudentName')),
-            'Email': request.form.get('email', student.to_dict().get('Email')),
-            'Password': request.form.get('password', student.to_dict().get('Password')),
-            'Points': int(request.form.get('points', student.to_dict().get('Points', 0))),
-            'DiplomaStudy': request.form.get('diploma_study', student.to_dict().get('DiplomaStudy')),
-            'EntryYear': int(request.form.get('entry_year', student.to_dict().get('EntryYear', 0)))
+            'StudentName': request.form.get('student_name'),
+            'Email': request.form.get('email'),
+            'Password': request.form.get('password'),
+            'Points': int(request.form.get('points')),
+            'DiplomaStudy': request.form.get('diploma_study'),  # Added
+            'EntryYear': int(request.form.get('entry_year'))
         }
-
         student_ref.update(updated_data)
 
-        # Send Discord notification
         send_discord_notification(f'✏️ Student {updated_data["StudentName"]} modified.')
-
-        # Log the action
-        admin_id = session.get('user_id')
         log_audit_action('modify_student', f'Modified student {updated_data["StudentName"]}')
 
         flash('Student account updated successfully!', 'success')
@@ -272,24 +263,24 @@ def manage_items():
 
     if request.method == 'POST':
         item_id = request.form.get('item_id')
-        points_cost = request.form.get('points_cost')
-        stock = request.form.get('stock')
+        value = request.form.get('value')
+        quantity = request.form.get('quantity')
 
         # Handle NoneType and invalid input for PointsCost and Stock
         item_data = {
-            'ItemName': request.form.get('item_name'),
-            'PointsCost': int(points_cost) if points_cost and points_cost.isdigit() else 0,
-            'Stock': int(stock) if stock and stock.isdigit() else 0
+            'Name': request.form.get('item_name'),
+            'Value': int(value) if value and value.isdigit() else 0,
+            'Quantity': int(quantity) if quantity and quantity.isdigit() else 0
         }
 
         items_ref.document(item_id).set(item_data)
 
         # Send Discord notification
-        send_discord_notification(f'📦 New item created: {item_data["ItemName"]} (Cost: {item_data["PointsCost"]} points, Stock: {item_data["Stock"]})')
+        send_discord_notification(f'📦 New item created: {item_data["Name"]} (Cost: {item_data["Value"]} points, Quantity: {item_data["Quantity"]})')
 
         # Log the action
         admin_id = session.get('user_id')
-        log_audit_action('create_item', f'Created item {item_data["ItemName"]}')
+        log_audit_action('create_item', f'Created item {item_data["Name"]}')
 
         flash('Item created successfully! ✔️', 'success')
         return redirect(url_for('manage_items'))
@@ -305,7 +296,7 @@ def delete_item(item_id):
     item = item_ref.get()
 
     if item.exists:
-        item_name = item.to_dict().get('ItemName', 'Unknown')
+        item_name = item.to_dict().get('Name', 'Unknown')
         item_ref.delete()
 
         # Send Discord notification

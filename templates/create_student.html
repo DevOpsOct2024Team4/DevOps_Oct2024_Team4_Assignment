@@ -72,24 +72,27 @@
     <form action="/admin/create-student" method="POST">
         <label for="student_id">Student ID:</label>
         <input type="text" name="student_id" required>
-
+    
         <label for="student_name">Student Name:</label>
         <input type="text" name="student_name" required>
-
+    
         <label for="email">Email:</label>
         <input type="email" name="email" required>
-
+    
         <label for="entry_year">Entry Year:</label>
         <input type="number" name="entry_year" required>
-
+    
         <label for="password">Password:</label>
         <input type="password" name="password" required>
-
+    
         <label for="points">Points:</label>
         <input type="number" name="points" value="0" required>
-
+    
+        <label for="diploma_study">Diploma of Study:</label>
+        <input type="text" name="diploma_study" required>
+    
         <button type="submit">Create Student</button>
-    </form>
+    </form>    
 
     <a href="/admin">Back to Dashboard</a>
 </body>
