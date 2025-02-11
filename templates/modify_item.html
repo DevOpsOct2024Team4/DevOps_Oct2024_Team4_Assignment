@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modify Item</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 350px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 15px 0 5px;
+            text-align: left;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            transition: all 0.3s ease-in-out;
+        }
+
+        input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .back-button {
+            display: inline-block;
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #495057;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Modify Item</h1>
+    <form method="POST">
+        <label for="item_name">Item Name:</label>
+        <input type="text" id="item_name" name="item_name" value="{{ item.Name }}" required>
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" value="{{ item.Quantity }}" required>
+
+        <label for="value">Value:</label>
+        <input type="number" id="value" name="value" value="{{ item.Value }}" required>
+
+        <button type="submit">Update Item</button>
+    </form>
+
+    <!-- Back Button -->
+    <a href="/admin/manage-items" class="back-button">Back to Manage Items</a>
+</div>
+
+</body>
+</html>
