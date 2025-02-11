@@ -15,6 +15,15 @@ ${BROWSER}   Chrome
 ${ADMIN_EMAIL}    hp@np.edu.sg
 ${ADMIN_PASSWORD}    wizardboy
 
+# New Variables for Student Creation
+${NEW_STUDENT_ID}        A1234567T
+${NEW_STUDENT_NAME}      TEST124
+${NEW_STUDENT_EMAIL}     test124@example.com
+${NEW_ENTRY_YEAR}        2025
+${NEW_DIPLOMA_STUDY}     Information Technology
+${NEW_STUDENT_PASSWORD}  Testing124
+${NEW_STUDENT_POINTS}    0
+
 *** Test Cases ***
 Student Login Successful
     [Documentation]    Verify that a student can successfully log in with valid credentials.
@@ -103,7 +112,65 @@ Admin Login Failed
     Wait Until Page Contains    Invalid email or password.
     [Teardown]    Close Browser
 
+# ✅ Test Case: Successful Student Account Creation
+Create Student Account Successfully
+    [Documentation]    Verify that an admin can create a new student account successfully.
+    Maximize Browser Window
 
+    # Login as Admin
+    Input Text    id=email    ${ADMIN_EMAIL}
+    Input Text    id=password    ${ADMIN_PASSWORD}
+    Click Button    xpath=//button[@type='submit']
+    Wait Until Page Contains    Welcome to the Admin Dashboard
+
+    # Navigate to Create Student Page
+    Click Link    xpath=//a[contains(@href, '/admin/create-student')]
+    Wait Until Page Contains    Create New Student Account
+
+    # Fill the Create Student Form
+    Input Text    name=student_id       ${NEW_STUDENT_ID}
+    Input Text    name=student_name     ${NEW_STUDENT_NAME}
+    Input Text    name=email            ${NEW_STUDENT_EMAIL}
+    Input Text    name=entry_year       ${NEW_ENTRY_YEAR}
+    Input Text    name=diploma_study    ${NEW_DIPLOMA_STUDY}
+    Input Text    name=password         ${NEW_STUDENT_PASSWORD}
+    Input Text    name=points           ${NEW_STUDENT_POINTS}
+
+    # Submit the Form
+    Click Button    xpath=//button[@type='submit']
+    Wait Until Page Contains    Student account created successfully!    timeout=10s
+
+    [Teardown]    Close Browser
+
+# ❌ Test Case: Failure (Missing Required Fields)
+Create Student Account Failure (Missing Fields)
+    [Documentation]    Verify that the system prevents student account creation if required fields are missing.
+    Maximize Browser Window
+
+    # Login as Admin
+    Input Text    id=email    ${ADMIN_EMAIL}
+    Input Text    id=password    ${ADMIN_PASSWORD}
+    Click Button    xpath=//button[@type='submit']
+    Wait Until Page Contains    Welcome to the Admin Dashboard
+
+    # Navigate to Create Student Page
+    Click Link    xpath=//a[contains(@href, '/admin/create-student')]
+    Wait Until Page Contains    Create New Student Account
+
+    # Leave required fields empty (Missing Student Name & Email)
+    Input Text    name=student_id       MISSING001
+    Input Text    name=entry_year       ${NEW_ENTRY_YEAR}
+    Input Text    name=diploma_study    ${NEW_DIPLOMA_STUDY}
+    Input Text    name=password         ${NEW_STUDENT_PASSWORD}
+    Input Text    name=points           ${NEW_STUDENT_POINTS}
+
+    # Submit the Form
+    Click Button    xpath=//button[@type='submit']
+
+    # Verify Error Message for Missing Fields
+    Wait Until Page Contains    This field is required.    timeout=10s
+
+    [Teardown]    Close Browser
 
 *** Keywords ***
 Send Test Results to Discord
