@@ -32,5 +32,31 @@ class TestRoutes(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Email not found.", response.data)
 
+# Failing Test Case 1: Firebase Connection Failure
+@patch('app.db')
+def test_check_firebase_failure(self, mock_db):
+    # Mock Firebase connection failure
+    mock_db.return_value = None
+
+    # Make a request to the /check_firebase route
+    response = self.app.get("/check_firebase")
+    self.assertEqual(response.status_code, 500)
+    self.assertIn(b"Firebase is NOT initialized!", response.data)
+
+# Failing Test Case 2: Invalid Login Credentials
+@patch('app.db')
+def test_login_failure(self, mock_db):
+    # Mock Firebase query to return no student (invalid email)
+    mock_db.collection.return_value.where.return_value.stream.return_value = []
+
+    # Simulate a POST request with invalid credentials
+    response = self.app.post("/login", data={
+        "Email": "wrong@example.com",
+        "Password": "wrongpassword"
+    }, follow_redirects=True)
+
+    self.assertEqual(response.status_code, 200)
+    self.assertIn(b"Email not found.", response.data)
+
 if __name__ == "__main__":
     unittest.main()
