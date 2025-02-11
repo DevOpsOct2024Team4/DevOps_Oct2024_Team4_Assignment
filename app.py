@@ -1,8 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import firebase_admin
 from firebase_admin import credentials, firestore
-from functools import wraps
-from datetime import datetime, timedelta
 import requests
 import os
 
@@ -20,301 +18,66 @@ db = firestore.client()
 # Initialize the Flask app (Keep only one instance)
 app = Flask(__name__, template_folder="templates")
 app.secret_key = "DevOps_key_Team4"
-app.permanent_session_lifetime = timedelta(minutes=5)
 
-@app.before_request
-def make_session_permanent():
-    session.permanent = True
-    session.modified = True
+@app.route("/test_firebase")
+def test_firebase():
+    try:
+        print("Fetching students from Firestore...")
+        students_ref = db.collection("students").stream()
+        students = [doc.to_dict() for doc in students_ref]
+        print("Students Retrieved:", students)  # Debug log
+        return {"students": students}, 200
+    except Exception as e:
+        print("🔥 Firebase Error:", str(e))  # Debug log
+        return {"error": str(e)}, 500
 
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'role' not in session or session['role'] != 'admin':
-            flash("Access denied: Admins only!", "danger")
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
 
-# Function to log audit actions
-def log_audit_action(action, details):
-    admin_name = session.get('admin_name', 'Unknown Admin')
-    audit_ref = db.collection('audit_logs')
-    log_data = {
-        'admin_name': admin_name,
-        'action': action,
-        'details': details,
-        'timestamp': datetime.utcnow()
-    }
-    audit_ref.add(log_data)
+# Page Routes
 
-# Discord Webhook Integration
-def send_discord_notification(message):
-    webhook_url = 'https://discord.com/api/webhooks/1338542484036386969/16kfW53a89Nu-a-MWf5Q8Rmfog8iS_My6PQkeVY8kRNf01Amt3n6-JAtWIE-XgnK7tGL'
-    data = {"content": message}
-    requests.post(webhook_url, json=data)
+@app.route("/check_firebase")
+def check_firebase():
+    try:
+        if db:
+            return {"message": "Firebase is connected!"}, 200
+        else:
+            return {"error": "Firebase is NOT initialized!"}, 500
+    except Exception as e:
+        return {"error": str(e)}, 500
 
-@app.route("/")    
+
+@app.route("/")    # Landing Page
 def home():
+    """Landing page."""
     return render_template("index.html")
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == 'POST':
-        email = request.form.get('Email')
-        password = request.form.get('Password')
+    if request.method == "POST":
+        email = request.form.get("Email")
+        password = request.form.get("Password")
 
-        # Check Students Collection
-        students_ref = db.collection('students')
-        student_query = students_ref.where('Email', '==', email).where('Password', '==', password).stream()
+        # Debugging
+        print(f"DEBUG: Email - {email}, Password - {password}")
 
-        student = None
-        for doc in student_query:
-            student = doc.to_dict()
-            student['id'] = doc.id
-            break
+        # Dummy validation for now (replace with Firebase auth later)
+        if email == "john.tan.2024@example.edu" and password == "Johntan111":
+            session["user_id"] = "A1234567X"
+            return redirect(url_for("student_dashboard", student_id="A1234567X"))
+        elif email == "hp@np.edu.sg" and password == "wizardboy":
+            session["user_id"] = "Admin 1"
+            return redirect(url_for("admin_dashboard"))
+        else:
+            flash("Invalid username or password", "danger")
 
-        if student:
-            session['user_id'] = student['id']
-            session['role'] = 'student'
-            return redirect(url_for('student_dashboard', student_id=student['id']))
+    return render_template("login.html")
 
-        # Check Admins Collection if student not found
-        admins_ref = db.collection('admins')
-        admin_query = admins_ref.where('Email', '==', email).where('Password', '==', password).stream()
-
-        admin = None
-        for doc in admin_query:
-            admin = doc.to_dict()
-            admin['id'] = doc.id
-            break
-
-        if admin:
-            session['user_id'] = admin['id']
-            session['admin_name'] = admin['Name']
-            session['role'] = 'admin'
-            return redirect(url_for('admin_dashboard'))
-
-        flash("Invalid email or password.", "danger")
-
-    return render_template('login.html')
-
-
-@app.route('/recover_password', methods=['GET', 'POST'])
-def recover_password():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        new_password = request.form.get('new_password')
-
-        try:
-            print(f"🔍 Trying to reset password for: {email}")  # Debugging line
-            students_ref = db.collection('students').where('Email', '==', email).stream()
-            student_found = False
-
-            for doc in students_ref:
-                student_id = doc.id
-                print(f"✅ Found student ID: {student_id}")  # Debugging line
-                db.collection('students').document(student_id).update({'Password': new_password})
-                student_found = True
-                send_discord_notification(f'🔑 Password updated for {email}')
-                flash('Password has been successfully updated!', 'success')
-                return redirect(url_for('login'))
-
-            if not student_found:
-                flash('No student found with the provided email.', 'danger')
-
-        except Exception as e:
-            print(f"❌ Error: {e}")  # Debugging line
-            flash(f"An error occurred: {str(e)}", 'danger')
-
-    return render_template('recover_password.html')
-
-
-@app.route('/admin')
-@admin_required
+@app.route("/admin_dashboard")
 def admin_dashboard():
-    students = [{**doc.to_dict(), 'id': doc.id} for doc in db.collection('students').stream()]
-    items = [{**doc.to_dict(), 'id': doc.id} for doc in db.collection('redeemable_items').stream()]
-    audit_logs = [{**doc.to_dict(), 'id': doc.id} for doc in db.collection('audit_logs').order_by('timestamp', direction=firestore.Query.DESCENDING).stream()]
-    
-    return render_template('admin.html', students=students, items=items, audit_logs=audit_logs)
-
-
-@app.route('/admin/create-student', methods=['GET', 'POST'])
-@admin_required
-def create_student():
-    if request.method == 'POST':
-        student_id = request.form.get('student_id')
-        student_data = {
-            'StudentName': request.form.get('student_name'),
-            'Email': request.form.get('email'),
-            'Password': request.form.get('password'),
-            'Points': int(request.form.get('points')),
-            'DiplomaStudy': request.form.get('diploma_study'),
-            'EntryYear': int(request.form.get('entry_year'))
-        }
-        db.collection('students').document(student_id).set(student_data)
-        
-        # Send Discord notification
-        send_discord_notification(f'📝 New student created: {student_data["StudentName"]}')
-        
-        # Log the action
-        admin_id = session.get('user_id')
-        log_audit_action('create_student', f'Created student {student_data["StudentName"]}')
-        
-        flash('Student account created successfully!', 'success')
-        return redirect(url_for('list_students'))
-
-    return render_template('create_student.html')
-
-@app.route('/admin/delete-student/<student_id>', methods=['POST'])
-@admin_required
-def delete_student(student_id):
-    student_ref = db.collection('students').document(student_id)
-    student = student_ref.get()
-
-    if student.exists:
-        student_name = student.to_dict().get('StudentName', 'Unknown')
-        student_ref.delete()
-
-        # Send Discord notification
-        send_discord_notification(f'❌ Student {student_id} ({student_name}) deleted.')
-
-        # Log the action
-        admin_id = session.get('user_id')
-        log_audit_action('delete_student', f'Deleted student {student_name}')
-
-        flash('Student account deleted successfully!', 'success')
-    else:
-        flash('Student not found!', 'danger')
-
-    return redirect(url_for('list_students'))
-
-@app.route('/admin/modify-student/<student_id>', methods=['GET', 'POST'])
-@admin_required
-def modify_student(student_id):
-    student_ref = db.collection('students').document(student_id)
-    student = student_ref.get()
-
-    if not student.exists:
-        flash('Student not found!', 'danger')
-        return redirect(url_for('list_students'))
-
-    if request.method == 'POST':
-        updated_data = {
-            'StudentName': request.form.get('student_name'),
-            'Email': request.form.get('email'),
-            'Password': request.form.get('password'),
-            'Points': int(request.form.get('points')),
-            'DiplomaStudy': request.form.get('diploma_study'),
-            'EntryYear': int(request.form.get('entry_year'))
-        }
-        student_ref.update(updated_data)
-
-        # Send Discord notification
-        send_discord_notification(f'✏️ Student {updated_data["StudentName"]} modified.')
-
-        # Log the action
-        admin_id = session.get('user_id')
-        log_audit_action('modify_student', f'Modified student {updated_data["StudentName"]}')
-
-        flash('Student account updated successfully!', 'success')
-        return redirect(url_for('list_students'))
-
-    return render_template('modify_student.html', student=student.to_dict(), student_id=student_id)
-
+    if "admin" not in session:
+        return redirect(url_for("login"))  # Redirect to login if not admin
+    return render_template("admin_dashboard.html")  # Render the admin dashboard template
 
 @app.route("/student/<student_id>")
-def student_dashboard(student_id):
-    student_ref = db.collection("students").document(student_id)
-    student_doc = student_ref.get()
-
-    if student_doc.exists:
-        student = student_doc.to_dict()
-        student["id"] = student_id  
-
-        items_ref = db.collection("redeemable_items").stream()
-        redeemable_items = [{"id": doc.id, **doc.to_dict()} for doc in items_ref]  
-
-        return render_template("student.html", student=student, items=redeemable_items)
-    else:
-        return "Student not found", 404
-    return redirect(url_for('list_students'))
-
-@app.route('/admin/list-students', methods=['GET'])
-def list_students():
-    students_ref = db.collection('students').stream()
-    students = [{**doc.to_dict(), 'id': doc.id} for doc in students_ref]
-    return render_template('list_students.html', students=students)
-
-@app.route('/admin/search-student', methods=['GET'])
-def search_student():
-    query = request.args.get('query')
-    results = []
-    students_ref = db.collection('students')
-
-    # Search by Student ID
-    doc = students_ref.document(query).get()
-    if doc.exists:
-        results.append({**doc.to_dict(), 'id': doc.id})
-
-    # Search by Student Name
-    query_ref = students_ref.where('StudentName', '==', query).stream()
-    results.extend([{**doc.to_dict(), 'id': doc.id} for doc in query_ref])
-
-    return render_template('list_students.html', students=results)
-
-@app.route('/admin/manage-items', methods=['GET', 'POST'])
-@admin_required
-def manage_items():
-    items_ref = db.collection('redeemable_items')
-
-    if request.method == 'POST':
-        item_id = request.form.get('item_id')
-        item_data = {
-            'ItemName': request.form.get('item_name'),
-            'PointsCost': int(request.form.get('points_cost')),
-            'Stock': int(request.form.get('stock'))
-        }
-        items_ref.document(item_id).set(item_data)
-
-        # Send Discord notification
-        send_discord_notification(f'🎁 New item created: {item_data["ItemName"]}')
-
-        # Log the action
-        admin_id = session.get('user_id')
-        log_audit_action('create_item', f'Created item {item_data["ItemName"]}')
-
-        flash('Item created successfully!', 'success')
-        return redirect(url_for('manage_items'))
-
-    items = [{**doc.to_dict(), 'id': doc.id} for doc in items_ref.stream()]
-    return render_template('manage_items.html', items=items)
-
-@app.route('/admin/delete-item/<item_id>', methods=['POST'])
-@admin_required
-def delete_item(item_id):
-    item_ref = db.collection('redeemable_items').document(item_id)
-    item = item_ref.get()
-
-    if item.exists:
-        item_name = item.to_dict().get('ItemName', 'Unknown')
-        item_ref.delete()
-
-        # Send Discord notification
-        send_discord_notification(f'🗑️ Item {item_id} ({item_name}) deleted.')
-
-        # Log the action
-        admin_id = session.get('user_id')
-        log_audit_action('delete_item', f'Deleted item {item_name}')
-
-        flash('Item deleted successfully!', 'success')
-    else:
-        flash('Item not found!', 'danger')
-
-    return redirect(url_for('manage_items'))
-
-@app.route("/student/<student_id>", endpoint='student_dashboard_view')
 def student_dashboard(student_id):
     student_ref = db.collection("students").document(student_id)
     student_doc = student_ref.get()
@@ -356,7 +119,7 @@ def redeem():
         student_ref.update({"Points": new_points})
         item_ref.update({"Quantity": new_stock})
 
-        # Send Discord Webhook
+        # ✅ Send Discord Webhook
         webhook_url = "https://discord.com/api/webhooks/1337845678264549458/gqSqmxx9dQ44faBRttjkSgtawhWW2ChCq6hLTBwnqOudvKhcOtCRoeG5BdWvhVNBGaDG"
         discord_message = {
             "content": f"🎯 **Redemption Alert!**\nStudent **{student['StudentName']}** redeemed **{item['Name']}** for **{item['Value']} points**.\nPoints Left: **{new_points}**, Stock Remaining: **{new_stock}**."
@@ -364,22 +127,15 @@ def redeem():
         try:
             response = requests.post(webhook_url, json=discord_message)
             if response.status_code == 204:
-                print("Discord notification sent!")
+                print("✅ Discord notification sent!")
             else:
-                print(f"Failed to send Discord notification. Status code: {response.status_code}")
+                print(f"❌ Failed to send Discord notification. Status code: {response.status_code}")
         except Exception as e:
-            print(f"Discord Webhook Error: {e}")
+            print(f"❌ Discord Webhook Error: {e}")
 
         return "Redemption Successful!", 200
     else:
         return "Insufficient points or item out of stock!", 400
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    flash("You have been logged out.", "info")
-    return redirect(url_for('login'))
-
 
 if __name__ == "__main__":
     app.run(debug=True)
