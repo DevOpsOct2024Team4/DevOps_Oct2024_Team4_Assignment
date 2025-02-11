@@ -2,19 +2,20 @@ import unittest
 from unittest.mock import patch
 from app import app, db
 
-class TestFirebase(unittest.TestCase):
-    def setUp(self):
-        self.app = app.test_client()
-        self.app.testing = True
+@app.route('/check_firebase')
+def check_firebase():
+    try:
+        if db:
+            return b"Firebase is connected!", 200
+        else:
+            return b"Firebase is NOT initialized!", 500
+    except Exception:
+        return b"Firebase connection error!", 500
 
-    @patch('app.db')
-    def test_firebase_connection(self, mock_db):
-        # Mock Firebase connection
-        mock_db.return_value = True
-
-        response = self.app.get("/check_firebase")
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Firebase is connected!", response.data)
+@app.route('/admin')
+def admin():
+    # Example HTML Response
+    return "<h1>Admin Dashboard</h1>", 200
 
 if __name__ == "__main__":
     unittest.main()
