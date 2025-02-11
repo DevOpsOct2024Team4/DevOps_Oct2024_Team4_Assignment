@@ -93,7 +93,7 @@ def login():
             session['user_id'] = admin['id']
             session['admin_name'] = admin['Name']
             session['role'] = 'admin'
-            return redirect(url_for('admin_dashboard'))
+            return redirect('/admin')  # ✅ Redirect to Admin Dashboard
 
         flash("Invalid email or password.", "danger")
 

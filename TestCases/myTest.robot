@@ -10,17 +10,10 @@ ${STUDENT_PASSWORD}    Johntan222
 ${INVALID_EMAIL}    invalid@example.com
 ${INVALID_PASSWORD}    wrongpass
 ${ITEM_NAME}    Book
-
-*** Test Cases ***
-
-*** Settings ***
-Library    SeleniumLibrary
-
-*** Variables ***
 ${URL}       http://127.0.0.1:5000
 ${BROWSER}   Chrome
-${STUDENT_EMAIL}    john.tan.2024@example.edu
-${STUDENT_PASSWORD}  Johntan222
+${ADMIN_EMAIL}    hp@np.edu.sg
+${ADMIN_PASSWORD}    wizardboy
 
 *** Test Cases ***
 Student Login Successful
@@ -86,6 +79,31 @@ Redeem Item Failure Due to Insufficient Points
     Wait Until Page Contains    Insufficient points or item out of stock!
     Page Should Contain    Insufficient points or item out of stock!
     Close Browser
+
+*** Test Cases ***
+Admin Login Successful
+    [Documentation]    Verify that an admin can log in with valid credentials.
+    Open Browser    ${URL}/login    ${BROWSER}
+    Maximize Browser Window
+    Wait Until Page Contains Element    xpath=//form[@action='/login']    timeout=15s
+    Input Text    name=Email    ${ADMIN_EMAIL}
+    Input Text    name=Password    ${ADMIN_PASSWORD}
+    Click Button    xpath=//button[@type='submit']
+    Wait Until Page Contains    Welcome to the Admin Dashboard
+    [Teardown]    Close Browser
+
+Admin Login Failed
+    [Documentation]    Verify that login fails with invalid admin credentials.
+    Open Browser    ${URL}/login    ${BROWSER}
+    Maximize Browser Window
+    Wait Until Page Contains Element    xpath=//form[@action='/login']    timeout=15s
+    Input Text    name=Email    wrong.admin@example.com
+    Input Text    name=Password    wrongpassword
+    Click Button    xpath=//button[@type='submit']
+    Wait Until Page Contains    Invalid email or password.
+    [Teardown]    Close Browser
+
+
 
 *** Keywords ***
 Send Test Results to Discord
