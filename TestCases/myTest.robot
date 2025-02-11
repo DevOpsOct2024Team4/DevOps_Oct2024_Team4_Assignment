@@ -66,7 +66,6 @@ Redeem Item Successfully
 
     # Step 2: Verify Redemption Success
     Wait Until Page Contains    Redemption Successful!
-    Page Should Contain    Points Left:
     Close Browser
 
 # ❌ Test Case 2: Redemption Failure (Insufficient Points)

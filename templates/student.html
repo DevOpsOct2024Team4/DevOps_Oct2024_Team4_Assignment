@@ -54,26 +54,58 @@ button:hover {
 </style>
 </head>
 <body>
-    <div id="student_dashboard">
-        <h1 id="student_dashboard">Welcome, {{ student['StudentName'] }}!</h1>
-        <p>Email: {{ student['Email'] }}</p>
-        <p>Diploma: {{ student['DiplomaStudy'] }}</p>
-        <p>Entry Year: {{ student['EntryYear'] }}</p>
-        <p>Points: {{ student['Points'] }}</p>
-
-        <h2>Redeemable Items</h2>
-        <ul>
-            {% for item in items %}
-            <li>{{ item['Name'] }} - {{ item['Value'] }} Points (Stock: {{ item['Quantity'] }})
-                <form action="{{ url_for('redeem') }}" method="POST">
-                    <input type="hidden" name="student_id" value="{{ student['id'] }}">
-                    <input type="hidden" name="item_name" value="{{ item['id'] }}">  <!-- Firestore document ID -->
-                    <button type="submit" id="redeem_item">Redeem</button>
-                </form>
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
+    <h1>Welcome, {{ student['StudentName'] }}!</h1>
+    <p>Email: {{ student['Email'] }}</p>
+    <p>Diploma: {{ student['DiplomaStudy'] }}</p>
+    <p>Entry Year: {{ student['EntryYear'] }}</p>
+    <p>Points: {{ student['Points'] }}</p>
 </body>
+<h2>Redeemable Items</h2>
+<ul>
+    {% for item in items %}
+    <li>{{ item['Name'] }} - {{ item['Value'] }} Points (Stock: {{ item['Quantity'] }})
+        <form action="{{ url_for('redeem') }}" method="POST">
+            <input type="hidden" name="student_id" value="{{ student['id'] }}">
+            <input type="hidden" name="item_name" value="{{ item['id'] }}">  <!-- Firestore document ID -->
+            <button type="submit">Redeem</button>
+        </form>
+    </li>
+    {% endfor %}
 </ul>
+<div id="logout-timer">Auto-Logout in: <span id="timer">10:00</span></div>
+
+<script>
+    let timeLeft = 300; // 5 minutes in seconds
+    const timerElement = document.getElementById('timer');
+
+    function updateTimer() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        if (timeLeft > 0) {
+            timeLeft--;
+        } else {
+            window.location.href = '/logout';  // Redirect to logout when timer runs out
+        }
+    }
+
+    setInterval(updateTimer, 1000);
+</script>
+
+<style>
+    #logout-timer {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        background-color: #ff4d4d;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        font-weight: bold;
+        font-family: Arial, sans-serif;
+        box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
 </html>
